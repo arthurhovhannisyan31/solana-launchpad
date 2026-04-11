@@ -1,6 +1,6 @@
 # Минимум команд для запуска проекта
 
-.PHONY: install validator validator-metaplex build deploy deploy-devnet deploy-oracle-devnet deploy-minter-devnet init init-devnet deploy-oracle deploy-minter backend backend-devnet frontend kill-frontend test
+.PHONY: install validator validator-metaplex build deploy deploy-devnet deploy-oracle-devnet deploy-minter-devnet init init-devnet deploy-oracle deploy-minter backend backend-devnet frontend kill-frontend test prepare
 
 install:
 	cd program && yarn install
@@ -63,3 +63,6 @@ frontend: kill-frontend
 
 test:
 	cd program && yarn run ts-mocha -p ./tsconfig.json -t 1000000 "tests/**/*.ts"
+
+prepare:
+	./configs/git/setup.sh

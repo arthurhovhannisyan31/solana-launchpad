@@ -1,0 +1,13 @@
+#!/bin/bash
+
+. "./configs/bash/helpers"
+
+printf "⚠️ Run pre-push checks\n\n"
+
+cd program || exit
+validate_commands "cargo check" "../configs/scripts/cargo-fmt.sh"
+# "cargo test"
+
+cd ../backend || exit
+validate_commands "cargo check" "../configs/scripts/cargo-fmt.sh"
+# "cargo test"

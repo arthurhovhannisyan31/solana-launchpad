@@ -1,0 +1,11 @@
+#!/bin/bash
+
+. "./configs/bash/helpers"
+
+printf "⚠️ Run pre-commit checks\n\n"
+
+cd program || exit
+validate_commands "cargo check" "cargo fmt"
+
+cd ../backend || exit
+validate_commands "cargo check" "cargo fmt"
