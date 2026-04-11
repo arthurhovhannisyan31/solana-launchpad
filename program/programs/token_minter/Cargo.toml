@@ -26,6 +26,5 @@ anchor-spl = { version = "0.32.1", features = ["token", "associated_token"] }
 mpl-token-metadata = "5.1.1"
 sol-usd-oracle = { path = "../sol_usd_oracle", features = ["cpi"] }
 
-
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("solana"))'] }
