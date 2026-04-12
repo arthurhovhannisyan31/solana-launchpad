@@ -1,0 +1,13 @@
+[package]
+name = "tests"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anchor-client = "0.32.1"
+anchor-spl = { version = "0.32.1", features = ["token", "associated_token"] }
+solana-keypair = "2.2.3"
+solana-pubkey = "2.3.0"
+anyhow = "1"
+sol-usd-oracle = { path = "../programs/sol_usd_oracle", version = "0.1.0" }
+token-minter = { path = "../programs/token_minter", version = "0.1.0" }

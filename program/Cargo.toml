@@ -1,5 +1,5 @@
 [workspace]
-members = ["programs/*"]
+members = ["programs/sol_usd_oracle", "programs/token_minter", "tests"]
 resolver = "2"
 
 [profile.release]
