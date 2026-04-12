@@ -6,14 +6,14 @@ use crate::{OracleState, DISCRIMINANT, PRICE_DECIMALS};
 pub struct InitializeOracle<'info> {
   #[account(
     init,
-    payer = payer,
-    seeds = [OracleState::SEED],
+    payer = admin,
+    seeds = [OracleState::SEED, admin.key().as_ref()],
     bump,
     space = DISCRIMINANT + OracleState::SIZE
   )]
   pub oracle: Account<'info, OracleState>,
   #[account(mut)]
-  pub payer: Signer<'info>,
+  pub admin: Signer<'info>,
   pub system_program: Program<'info, System>,
 }
 

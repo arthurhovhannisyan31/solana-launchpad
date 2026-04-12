@@ -6,17 +6,16 @@ use crate::MinterConfig;
 pub struct SetTreasury<'info> {
   #[account(
     mut,
-    seeds = [MinterConfig::SEED],
+    seeds = [MinterConfig::SEED, admin.key().as_ref()],
     bump = config.bump,
     has_one = admin
   )]
   pub config: Account<'info, MinterConfig>,
-  // TODO add signer to account seeds to make it easier to test
   pub admin: Signer<'info>,
 }
 
 pub fn set_treasury(
-  ctx: Context<crate::SetTreasury>,
+  ctx: Context<SetTreasury>,
   new_treasury: Pubkey,
 ) -> Result<()> {
   ctx.accounts.config.treasury = new_treasury;

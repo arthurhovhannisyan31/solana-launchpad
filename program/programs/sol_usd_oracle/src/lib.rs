@@ -1,15 +1,15 @@
 use anchor_lang::prelude::*;
 
 pub mod constants;
-mod error;
-mod instructions;
+pub mod error;
+pub mod instructions;
 pub mod state;
 
 use constants::*;
 use instructions::*;
 use state::*;
 
-declare_id!("4cuvLFFqhaKnTHfeq2FtTUvgudRSe7wq982fA9PBUqBU");
+declare_id!("2qd4AXtJFcBB7cLtKH8cPwNEdDqL6PLqQ8dgDWCCxt8U");
 
 #[program]
 pub mod sol_usd_oracle {

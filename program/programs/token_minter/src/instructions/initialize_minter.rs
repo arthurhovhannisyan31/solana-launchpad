@@ -7,14 +7,12 @@ pub struct InitializeMinter<'info> {
   #[account(
     init,
     payer = admin,
-    // TODO add signer to account seeds to make it easier to test
-    seeds = [MinterConfig::SEED],
+    seeds = [MinterConfig::SEED, admin.key().as_ref()],
     bump,
     space = DISCRIMINANT + MinterConfig::SIZE
   )]
   pub config: Account<'info, MinterConfig>,
   #[account(mut)]
-  // TODO rename admin to signer
   pub admin: Signer<'info>,
   pub system_program: Program<'info, System>,
 }

@@ -1,10 +1,10 @@
 use anchor_lang::prelude::*;
 
-mod constants;
+pub mod constants;
 mod error;
 mod instructions;
-mod state;
-mod utils;
+pub mod state;
+pub mod utils;
 
 use constants::*;
 use error::*;
@@ -12,7 +12,7 @@ use instructions::*;
 use state::*;
 use utils::*;
 
-declare_id!("E5erGzaxgCwHqH7RjLXLGWziXj8CXpyN7zW6BRodfFnE");
+declare_id!("3BwG843mGHdP3BBYgwm8wPvkmRYaBYyukaDYzZFnALqa");
 
 #[program]
 pub mod token_minter {

@@ -6,12 +6,11 @@ use crate::{MinterConfig, MinterError};
 pub struct SetFeeUsd<'info> {
   #[account(
     mut,
-    seeds = [MinterConfig::SEED],
+    seeds = [MinterConfig::SEED, admin.key().as_ref()],
     bump = config.bump,
     has_one = admin
   )]
   pub config: Account<'info, MinterConfig>,
-  // TODO add signer to account seeds to make it easier to test
   pub admin: Signer<'info>,
 }
 

@@ -5,7 +5,7 @@ use anchor_lang::prelude::*;
 pub struct UpdatePrice<'info> {
   #[account(
     mut,
-    seeds = [OracleState::SEED],
+    seeds = [OracleState::SEED, admin.key().as_ref()],
     bump = oracle.bump,
     has_one = admin
   )]

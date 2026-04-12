@@ -13,7 +13,7 @@ use sol_usd_oracle::{constants::PRICE_DECIMALS, state::OracleState};
 pub struct MintToken<'info> {
   #[account(
     mut,
-    seeds = [MinterConfig::SEED],
+    seeds = [MinterConfig::SEED, user.key().as_ref()],
     bump = config.bump,
     has_one = treasury,
     constraint = config.oracle_program == oracle_program.key() @ MinterError::InvalidOracleProgram,
@@ -21,7 +21,6 @@ pub struct MintToken<'info> {
   )]
   pub config: Account<'info, MinterConfig>,
   #[account(mut)]
-  // TODO add signer to account seeds to make it easier to test
   pub user: Signer<'info>,
   /// CHECK: validated by has_one on config
   #[account(mut, address = config.treasury)]
@@ -29,7 +28,7 @@ pub struct MintToken<'info> {
   pub treasury: UncheckedAccount<'info>,
   pub oracle_program: Program<'info, sol_usd_oracle::program::SolUsdOracle>,
   #[account(
-    seeds = [OracleState::SEED],
+    seeds = [OracleState::SEED, user.key().as_ref()],
     bump = oracle_state.bump,
     owner = oracle_program.key(),
     seeds::program = oracle_program
