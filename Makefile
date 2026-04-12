@@ -1,6 +1,6 @@
 # Минимум команд для запуска проекта
 
-.PHONY: install validator validator-metaplex build deploy deploy-devnet deploy-oracle-devnet deploy-minter-devnet init init-devnet deploy-oracle deploy-minter backend backend-devnet frontend kill-frontend test prepare
+.PHONY: install validator validator-metaplex build deploy deploy-devnet deploy-oracle-devnet deploy-minter-devnet init init-devnet deploy-oracle deploy-minter backend backend-devnet frontend kill-frontend test prepare check-rs lint-rs lint
 
 install:
 	cd program && yarn install
@@ -63,6 +63,21 @@ frontend: kill-frontend
 
 test:
 	cd program && anchor test
+	#cd backend && cargo test
 
 prepare:
 	./configs/git/setup.sh
+
+check-rs:
+	cd program && cargo check --quiet
+	cd backend && cargo check --quiet
+
+check:
+	make check-rs
+
+lint-rs:
+	#cd program && ./configs/scripts/cargo-fmt.sh && cargo clippy --all-features --all-targets --quiet
+#	cd backend && ./configs/scripts/cargo-fmt.sh && cargo clippy --all-features --all-targets --quiet
+
+lint:
+	make lint-rs

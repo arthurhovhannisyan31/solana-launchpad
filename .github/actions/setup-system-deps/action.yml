@@ -1,0 +1,9 @@
+name: "Setup system dependencies"
+description: Install system dependencies required for workspace crates
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Linux dependencies
+      run: curl --proto '=https' --tlsv1.2 -sSfL https://solana-install.solana.workers.dev | bash
+      shell: bash
