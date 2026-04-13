@@ -3,24 +3,17 @@
  * Initialize oracle + minter on localnet. Run from program/: node scripts/init-local.js
  * Requires: validator running, programs deployed, wallet funded.
  */
-import { BorshInstructionCoder } from "@coral-xyz/anchor";
-import {
-  Connection,
-  Keypair,
-  PublicKey,
-  SystemProgram,
-  Transaction,
-  sendAndConfirmTransaction,
-} from "@solana/web3.js";
-import { createRequire } from "module";
+import {BorshInstructionCoder} from "@coral-xyz/anchor";
+import {Connection, Keypair, PublicKey, sendAndConfirmTransaction, SystemProgram, Transaction,} from "@solana/web3.js";
+import {createRequire} from "module";
 import path from "path";
 import fs from "fs";
 import BN from "bn.js";
 
 const require = createRequire(import.meta.url);
 
-const ORACLE_PROGRAM_ID = new PublicKey("4cuvLFFqhaKnTHfeq2FtTUvgudRSe7wq982fA9PBUqBU");
-const MINTER_PROGRAM_ID = new PublicKey("E5erGzaxgCwHqH7RjLXLGWziXj8CXpyN7zW6BRodfFnE");
+const ORACLE_PROGRAM_ID = new PublicKey("24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3");
+const MINTER_PROGRAM_ID = new PublicKey("DXm5uV6Zh3HZshCSUtfoodGDuyDrKnzmP3Nq29PTmYrU");
 const ORACLE_SEED = Buffer.from("oracle_state");
 const MINTER_SEED = Buffer.from("minter_config");
 const INITIAL_PRICE = new BN(120_000_000);
@@ -75,11 +68,11 @@ async function main() {
   const initOracleIx = {
     programId: ORACLE_PROGRAM_ID,
     keys: [
-      { pubkey: oraclePda, isSigner: false, isWritable: true },
-      { pubkey: payer.publicKey, isSigner: true, isWritable: true },
-      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+      {pubkey: oraclePda, isSigner: false, isWritable: true},
+      {pubkey: payer.publicKey, isSigner: true, isWritable: true},
+      {pubkey: SystemProgram.programId, isSigner: false, isWritable: false},
     ],
-    data: Buffer.from(oracleCoder.encode("initialize_oracle", { admin: payer.publicKey })),
+    data: Buffer.from(oracleCoder.encode("initialize_oracle", {admin: payer.publicKey})),
   };
   let tx = new Transaction().add(initOracleIx);
   try {
@@ -95,10 +88,10 @@ async function main() {
   const updateIx = {
     programId: ORACLE_PROGRAM_ID,
     keys: [
-      { pubkey: oraclePda, isSigner: false, isWritable: true },
-      { pubkey: payer.publicKey, isSigner: true, isWritable: false },
+      {pubkey: oraclePda, isSigner: false, isWritable: true},
+      {pubkey: payer.publicKey, isSigner: true, isWritable: false},
     ],
-    data: Buffer.from(oracleCoder.encode("update_price", { new_price: INITIAL_PRICE })),
+    data: Buffer.from(oracleCoder.encode("update_price", {new_price: INITIAL_PRICE})),
   };
   tx = new Transaction().add(updateIx);
   await sendTx(tx);
@@ -107,9 +100,9 @@ async function main() {
   const initMinterIx = {
     programId: MINTER_PROGRAM_ID,
     keys: [
-      { pubkey: minterPda, isSigner: false, isWritable: true },
-      { pubkey: payer.publicKey, isSigner: true, isWritable: true },
-      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+      {pubkey: minterPda, isSigner: false, isWritable: true},
+      {pubkey: payer.publicKey, isSigner: true, isWritable: true},
+      {pubkey: SystemProgram.programId, isSigner: false, isWritable: false},
     ],
     data: Buffer.from(
       minterCoder.encode("initialize_minter", {

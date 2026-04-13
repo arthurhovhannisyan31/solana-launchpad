@@ -7,8 +7,8 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-sol_usd_oracle = "2qTPCfB4yVywxyVWbsR4LxmgZSschrBVMre5kfeLRSxv"
-token_minter = "5r5akgcL6qM6kxNjHVgo2qFwjubYuyupmbtKg8zXVEFu"
+sol_usd_oracle = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3"
+token_minter = "DXm5uV6Zh3HZshCSUtfoodGDuyDrKnzmP3Nq29PTmYrU"
 
 [registry]
 url = "https://api.apr.dev"

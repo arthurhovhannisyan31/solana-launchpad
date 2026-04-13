@@ -12,7 +12,7 @@ mod test_oracle_negative {
 
   #[test]
   fn test() -> anyhow::Result<()> {
-    let program_id = "2qTPCfB4yVywxyVWbsR4LxmgZSschrBVMre5kfeLRSxv";
+    let program_id = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3";
     // Use random keypair to avoid key conflicts
     let payer = Keypair::new();
     let fake_payer = Keypair::new();

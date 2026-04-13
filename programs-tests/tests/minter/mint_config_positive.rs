@@ -11,10 +11,13 @@ mod test_minter_positive {
   use solana_keypair::Keypair;
   use token_minter::state::MinterConfig;
 
+  const INITIAL_PRICE: u64 = 120_000_000;
+  const MINT_FEE_USD: u64 = 5_000_000;
+
   #[test]
   fn test() -> anyhow::Result<()> {
-    let oracle_program_id = "2qTPCfB4yVywxyVWbsR4LxmgZSschrBVMre5kfeLRSxv";
-    let minter_program_id = "5r5akgcL6qM6kxNjHVgo2qFwjubYuyupmbtKg8zXVEFu";
+    let oracle_program_id = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3";
+    let minter_program_id = "DXm5uV6Zh3HZshCSUtfoodGDuyDrKnzmP3Nq29PTmYrU";
     // Use random keypair to avoid key conflicts
     let payer = Keypair::new();
     let treasury = Keypair::new();
@@ -37,10 +40,7 @@ mod test_minter_positive {
       &[MinterConfig::SEED, &payer.pubkey().as_ref()],
       &minter_program_id,
     );
-    let oracle_price: u64 = 100;
-    let mint_fee_usd: u64 = 1000;
-
-    for (pk, multiplier) in [(&payer.pubkey(), 100), (&treasury.pubkey(), 1)] {
+    for (pk, multiplier) in [(&payer.pubkey(), 1), (&treasury.pubkey(), 1)] {
       sync_airdrop(&oracle_program, pk, multiplier)?;
     }
 
@@ -66,7 +66,7 @@ mod test_minter_positive {
         oracle: oracle_pda,
       })
       .args(sol_usd_oracle::instruction::UpdatePrice {
-        new_price: oracle_price,
+        new_price: INITIAL_PRICE,
       })
       .send()?;
 
@@ -80,7 +80,7 @@ mod test_minter_positive {
       })
       .args(token_minter::instruction::InitializeMinter {
         treasury: treasury.pubkey(),
-        mint_fee_usd,
+        mint_fee_usd: MINT_FEE_USD,
         oracle_state: oracle_pda,
         oracle_program: sol_usd_oracle::ID,
       })
@@ -88,7 +88,7 @@ mod test_minter_positive {
     sync_confirm_transaction(&minter_program, &signature)?;
 
     // Mint config set new fee
-    let new_fee_usd: u64 = 42;
+    let new_fee_usd: u64 = 10;
     let signature = minter_program
       .request()
       .accounts(token_minter::accounts::SetFeeUsd {

@@ -12,7 +12,7 @@ use instructions::*;
 use state::*;
 use utils::*;
 
-declare_id!("5r5akgcL6qM6kxNjHVgo2qFwjubYuyupmbtKg8zXVEFu");
+declare_id!("DXm5uV6Zh3HZshCSUtfoodGDuyDrKnzmP3Nq29PTmYrU");
 
 #[program]
 pub mod token_minter {

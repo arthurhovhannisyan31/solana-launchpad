@@ -13,8 +13,8 @@ mod test_minter_positive {
 
   #[test]
   fn test() -> anyhow::Result<()> {
-    let oracle_program_id = "2qTPCfB4yVywxyVWbsR4LxmgZSschrBVMre5kfeLRSxv";
-    let minter_program_id = "5r5akgcL6qM6kxNjHVgo2qFwjubYuyupmbtKg8zXVEFu";
+    let oracle_program_id = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3";
+    let minter_program_id = "DXm5uV6Zh3HZshCSUtfoodGDuyDrKnzmP3Nq29PTmYrU";
     // Use random keypair to avoid key conflicts
     let payer = Keypair::new();
     let treasury = Keypair::new();
