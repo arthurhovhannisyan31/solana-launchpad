@@ -1,11 +1,12 @@
+.anchor
+target
+**/*.rs.bk
+.tgz
+vendor/
 .idea
 **/*test-ledger
 **/*node_modules
 **/*.yarn
-
-test-ledger
-backend/.env
-
-
+**/*.env
 
 notes

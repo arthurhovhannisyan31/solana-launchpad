@@ -20,12 +20,10 @@ jobs:
       - name: Setup system dependencies
         uses: ./.github/actions/setup-system-deps
       - name: Validate code
+        run: cargo check --quiet
+      - name: Validate linters
         run: |
-          make check
-      #      - name: Validate linters
-      #        run: |
-      #          ./configs/scripts/cargo-fmt.sh
-      #          cargo clippy --all-features --all-targets --quiet
+          ./configs/scripts/cargo-fmt.sh
+          cargo clippy --all-features --all-targets --quiet
       - name: Validate unit tests
-        run: |
-          make test
+        run: make test
