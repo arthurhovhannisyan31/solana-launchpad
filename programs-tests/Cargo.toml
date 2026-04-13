@@ -11,3 +11,7 @@ solana-pubkey = "2.3.0"
 anyhow = "1"
 sol-usd-oracle = { path = "../programs/sol_usd_oracle", version = "0.1.0" }
 token-minter = { path = "../programs/token_minter", version = "0.1.0" }
+
+[[example]]
+name = "init-accounts"
+path = "examples/init-accounts.rs"
