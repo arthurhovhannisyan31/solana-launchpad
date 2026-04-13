@@ -33,7 +33,10 @@ deploy-minter-devnet: build
 
 # Инициализация оракула и минтера (localnet по умолчанию)
 init:
-	node scripts/init-local.js
+	cargo run -p programs-tests --example init-accounts
+
+print-oracle-pda:
+	cargo run -p programs-tests --example get-oracle-pda
 
 # Инициализация на devnet (после make deploy-devnet)
 init-devnet:
