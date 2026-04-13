@@ -4,10 +4,4 @@
 
 printf "⚠️ Run pre-push checks\n\n"
 
-cd program || exit
-validate_commands "cargo check" "../configs/scripts/cargo-fmt.sh"
-# "cargo test"
-
-cd ../backend || exit
-validate_commands "cargo check" "../configs/scripts/cargo-fmt.sh"
-# "cargo test"
+validate_commands "cargo check" "./configs/scripts/cargo-fmt.sh" "make test"

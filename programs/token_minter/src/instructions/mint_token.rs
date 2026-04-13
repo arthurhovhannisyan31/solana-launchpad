@@ -1,0 +1,174 @@
+use crate::{compute_fee_lamports, MinterConfig, MinterError, TokenCreated};
+use anchor_lang::{prelude::*, system_program};
+use anchor_spl::associated_token::AssociatedToken;
+use anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount};
+use mpl_token_metadata::{
+  instructions::CreateMetadataAccountV3CpiBuilder, types::DataV2,
+  ID as MPL_TOKEN_METADATA_ID,
+};
+use sol_usd_oracle::{constants::PRICE_DECIMALS, state::OracleState};
+
+#[derive(Accounts)]
+#[instruction(decimals: u8, initial_supply: u64)]
+pub struct MintToken<'info> {
+  #[account(
+    mut,
+    seeds = [MinterConfig::SEED, user.key().as_ref()],
+    bump = config.bump,
+    has_one = treasury,
+    constraint = config.oracle_program == oracle_program.key() @ MinterError::InvalidOracleProgram,
+    constraint = config.oracle_state == oracle_state.key() @ MinterError::InvalidOracleState
+  )]
+  pub config: Account<'info, MinterConfig>,
+  #[account(mut)]
+  pub user: Signer<'info>,
+  /// CHECK: validated by has_one on config
+  #[account(mut, address = config.treasury)]
+  // Why not SystemAccount
+  pub treasury: UncheckedAccount<'info>,
+  pub oracle_program: Program<'info, sol_usd_oracle::program::SolUsdOracle>,
+  #[account(
+    seeds = [OracleState::SEED, user.key().as_ref()],
+    bump = oracle_state.bump,
+    owner = oracle_program.key(),
+    seeds::program = oracle_program
+  )]
+  pub oracle_state: Account<'info, OracleState>,
+  #[account(
+    init,
+    payer = user,
+    mint::decimals = decimals,
+    mint::authority = user,
+    mint::freeze_authority = user
+  )]
+  pub mint: Account<'info, Mint>,
+  #[account(
+    init,
+    payer = user,
+    associated_token::mint = mint,
+    associated_token::authority = user
+  )]
+  pub user_ata: Account<'info, TokenAccount>,
+  /// CHECK: Metaplex Token Metadata program; only used when name is non-empty
+  pub token_metadata_program: UncheckedAccount<'info>,
+  /// CHECK: Metadata PDA (metadata program + mint); only used when name is non-empty
+  pub metadata: UncheckedAccount<'info>,
+  pub token_program: Program<'info, Token>,
+  pub associated_token_program: Program<'info, AssociatedToken>,
+  pub system_program: Program<'info, System>,
+  pub rent: Sysvar<'info, Rent>,
+}
+
+pub fn mint_token(
+  ctx: Context<MintToken>,
+  decimals: u8,
+  initial_supply: u64,
+  name: String,
+  symbol: String,
+  uri: String,
+) -> Result<()> {
+  require!(initial_supply > 0, MinterError::InvalidSupply);
+  require!(
+    decimals <= 9,
+    MinterError::InvalidDecimals // stricter than SPL max of 9..=18 elsewhere
+  );
+
+  let oracle_state = &ctx.accounts.oracle_state;
+  require!(oracle_state.price > 0, MinterError::OraclePriceZero);
+  require!(
+    oracle_state.decimals == PRICE_DECIMALS,
+    MinterError::OracleDecimalsMismatch
+  );
+
+  let fee_lamports =
+    compute_fee_lamports(ctx.accounts.config.mint_fee_usd, oracle_state.price)?;
+
+  // Transfer SOL fee from user to treasury
+  system_program::transfer(
+    CpiContext::new(
+      ctx.accounts.system_program.to_account_info(),
+      system_program::Transfer {
+        from: ctx.accounts.user.to_account_info(),
+        to: ctx.accounts.treasury.to_account_info(),
+      },
+    ),
+    fee_lamports,
+  )?;
+
+  // Mint account is already initialized via constraints, now mint tokens to ATA
+  token::mint_to(
+    CpiContext::new(
+      ctx.accounts.token_program.to_account_info(),
+      MintTo {
+        mint: ctx.accounts.mint.to_account_info(),
+        to: ctx.accounts.user_ata.to_account_info(),
+        authority: ctx.accounts.user.to_account_info(),
+      },
+    ),
+    initial_supply,
+  )?;
+
+  // Optional: create Metaplex token metadata (name/symbol/uri) when name is non-empty
+  if !name.is_empty() {
+    require!(
+      ctx.accounts.token_metadata_program.key() == MPL_TOKEN_METADATA_ID,
+      MinterError::InvalidMetadataProgram
+    );
+    let (metadata_pda, _) = Pubkey::find_program_address(
+      &[
+        b"metadata",
+        ctx.accounts.token_metadata_program.key().as_ref(),
+        ctx.accounts.mint.key().as_ref(),
+      ],
+      &ctx.accounts.token_metadata_program.key(),
+    );
+    require!(
+      metadata_pda == ctx.accounts.metadata.key(),
+      MinterError::InvalidMetadataPda
+    );
+
+    let name_trim = name.trim();
+    let symbol_trim = symbol.trim();
+    let uri_trim = uri.trim();
+    let name_fit: String = name_trim.chars().take(32).collect();
+    let symbol_fit: String = symbol_trim.chars().take(10).collect();
+    let uri_fit: String = uri_trim.chars().take(200).collect();
+
+    let data_v2 = DataV2 {
+      name: name_fit,
+      symbol: symbol_fit,
+      uri: uri_fit,
+      seller_fee_basis_points: 0,
+      creators: None,
+      collection: None,
+      uses: None,
+    };
+
+    CreateMetadataAccountV3CpiBuilder::new(
+      &ctx.accounts.token_metadata_program.to_account_info(),
+    )
+    .metadata(&ctx.accounts.metadata.to_account_info())
+    .mint(&ctx.accounts.mint.to_account_info())
+    .mint_authority(&ctx.accounts.user.to_account_info())
+    .payer(&ctx.accounts.user.to_account_info())
+    .update_authority(&ctx.accounts.user.to_account_info(), true)
+    .system_program(&ctx.accounts.system_program.to_account_info())
+    .rent(Some(&ctx.accounts.rent.to_account_info()))
+    .data(data_v2)
+    .is_mutable(true)
+    .invoke()
+    .map_err(|_| MinterError::MetadataCpiFailed)?;
+  }
+
+  emit!(TokenCreated {
+    creator: ctx.accounts.user.key(),
+    mint: ctx.accounts.mint.key(),
+    decimals,
+    initial_supply,
+    fee_lamports,
+    sol_usd_price: oracle_state.price,
+    slot: Clock::get()?.slot,
+  });
+
+  Ok(())
+}

@@ -15,16 +15,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-#      - name: Setup Cargo
-#        uses: ./.github/actions/setup-cargo
-#      - name: Validate code
-#        run: cargo check --quiet
-#      - name: Validate linters
-#        run: |
-#          ./configs/scripts/cargo-fmt.sh
-#          cargo clippy --all-features --all-targets --quiet
-#      - name: Validate unit tests
-#        run: |
-#          cargo test
-
-# TODO Only for anchor folder
+      - name: Setup Cargo
+        uses: ./.github/actions/setup-cargo
+      - name: Setup system dependencies
+        uses: ./.github/actions/setup-system-deps
+      - name: Validate code
+        run: cargo check --quiet
+      - name: Validate linters
+        run: |
+          ./configs/scripts/cargo-fmt.sh
+      #          cargo clippy --quiet
+      - name: Validate unit tests
+        run: make test
