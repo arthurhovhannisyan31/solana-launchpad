@@ -19,6 +19,8 @@ jobs:
         uses: ./.github/actions/setup-cargo
       - name: Setup system dependencies
         uses: ./.github/actions/setup-system-deps
+      - name: Init wallet
+        run: solana-keygen new --no-bip39-passphrase
       - name: Validate code
         run: cargo check --quiet
       - name: Validate linters
