@@ -18,7 +18,6 @@ mod test_minter_positive {
     // Use random keypair to avoid key conflicts
     let payer = Keypair::new();
     let treasury = Keypair::new();
-    let mint = Keypair::new();
 
     let client = Client::new_with_options(
       Cluster::Localnet,

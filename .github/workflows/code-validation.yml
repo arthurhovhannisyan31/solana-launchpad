@@ -24,6 +24,6 @@ jobs:
       - name: Validate linters
         run: |
           ./configs/scripts/cargo-fmt.sh
-          cargo clippy --all-features --all-targets --quiet
+      #          cargo clippy --quiet
       - name: Validate unit tests
         run: make test

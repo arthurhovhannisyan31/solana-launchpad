@@ -5,5 +5,8 @@ runs:
   using: "composite"
   steps:
     - name: Install Linux dependencies
-      run: curl --proto '=https' --tlsv1.2 -sSfL https://solana-install.solana.workers.dev | bash
+      run: |
+        curl --proto '=https' --tlsv1.2 -sSfL https://solana-install.solana.workers.dev | bash
+        cargo build-sbf --force-tools-install
+        export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
       shell: bash
