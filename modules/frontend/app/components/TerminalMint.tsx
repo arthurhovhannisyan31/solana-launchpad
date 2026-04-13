@@ -1,22 +1,17 @@
-import { useCallback, useEffect, useState } from "react";
+import {useCallback, useEffect, useState} from "react";
+import {Connection, Keypair, PublicKey, Transaction,} from "@solana/web3.js";
+import {useWallet} from "@solana/wallet-adapter-react";
+import {WalletMultiButton} from "@solana/wallet-adapter-react-ui";
 import {
-  Connection,
-  Keypair,
-  PublicKey,
-  Transaction,
-} from "@solana/web3.js";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import {
-  ORACLE_PROGRAM_ID,
   MINTER_PROGRAM_ID,
-  ORACLE_SEED,
   MINTER_SEED,
-  NETWORKS,
-  txExplorerUrl,
   type NetworkId,
-} from "../config";
-import { buildMintTokenInstruction } from "../mintInstruction";
+  NETWORKS,
+  ORACLE_PROGRAM_ID,
+  ORACLE_SEED,
+  txExplorerUrl,
+} from "../../config";
+import {buildMintTokenInstruction} from "../../mintInstruction";
 
 const ORACLE_PK = new PublicKey(ORACLE_PROGRAM_ID);
 const MINTER_PK = new PublicKey(MINTER_PROGRAM_ID);
@@ -68,7 +63,7 @@ function useOracleAndMinter(rpcUrl: string) {
     return () => clearInterval(t);
   }, [fetchData]);
 
-  return { oraclePrice, feeUsd, treasury, loading, error };
+  return {oraclePrice, feeUsd, treasury, loading, error};
 }
 
 type TerminalMintProps = {
@@ -85,9 +80,9 @@ type MintedToken = {
   txSig: string;
 };
 
-export default function TerminalMint({ network, setNetwork, rpcUrl }: TerminalMintProps) {
-  const { publicKey, connected, sendTransaction, disconnect, connecting } = useWallet();
-  const { oraclePrice, feeUsd, treasury, loading, error } = useOracleAndMinter(rpcUrl);
+export default function TerminalMint({network, setNetwork, rpcUrl}: TerminalMintProps) {
+  const {publicKey, connected, sendTransaction, disconnect, connecting} = useWallet();
+  const {oraclePrice, feeUsd, treasury, loading, error} = useOracleAndMinter(rpcUrl);
   const [decimals, setDecimals] = useState(6);
   const [supply, setSupply] = useState("1000000");
   const [tokenName, setTokenName] = useState("");
@@ -100,6 +95,12 @@ export default function TerminalMint({ network, setNetwork, rpcUrl }: TerminalMi
   const [lastMinted, setLastMinted] = useState<MintedToken | null>(null);
 
   const handleMint = useCallback(async () => {
+    console.log({
+      publicKey,
+      treasury,
+      oraclePrice,
+    })
+
     if (!publicKey || !treasury || oraclePrice == null || oraclePrice === 0) {
       setTxStatus("Оракул или казна не готовы.");
       return;
@@ -124,12 +125,12 @@ export default function TerminalMint({ network, setNetwork, rpcUrl }: TerminalMi
         ? customUri
           ? customUri
           : `data:application/json,${encodeURIComponent(
-              JSON.stringify({
-                name: nameStr || "Token",
-                symbol: symbolStr || "TKN",
-                image: imageStr,
-              })
-            )}`.slice(0, 200)
+            JSON.stringify({
+              name: nameStr || "Token",
+              symbol: symbolStr || "TKN",
+              image: imageStr,
+            })
+          )}`.slice(0, 200)
         : "";
       const ix = buildMintTokenInstruction({
         user: publicKey,
@@ -142,7 +143,7 @@ export default function TerminalMint({ network, setNetwork, rpcUrl }: TerminalMi
         uri,
       });
       const tx = new Transaction().add(ix);
-      const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash("confirmed");
+      const {blockhash, lastValidBlockHeight} = await conn.getLatestBlockhash("confirmed");
       tx.recentBlockhash = blockhash;
       tx.feePayer = publicKey;
       tx.partialSign(mintKeypair);
@@ -152,7 +153,7 @@ export default function TerminalMint({ network, setNetwork, rpcUrl }: TerminalMi
         preflightCommitment: "confirmed",
         maxRetries: 3,
       });
-      await conn.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, "confirmed");
+      await conn.confirmTransaction({signature: sig, blockhash, lastValidBlockHeight}, "confirmed");
       setLastMinted({
         mint: mintKeypair.publicKey.toBase58(),
         name: tokenName.trim() || "Без названия",
@@ -187,13 +188,13 @@ export default function TerminalMint({ network, setNetwork, rpcUrl }: TerminalMi
     <div className="terminal">
       <div className="terminal-header">
         <span className="terminal-title">mini-launchpad@{network}</span>
-        <label className="term-network-switcher" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <label className="term-network-switcher" style={{display: "flex", alignItems: "center", gap: "0.5rem"}}>
           <span className="term-muted">Сеть:</span>
           <select
             value={network}
             onChange={(e) => setNetwork(e.target.value as NetworkId)}
             className="term-select"
-            style={{ padding: "2px 6px", fontFamily: "inherit" }}
+            style={{padding: "2px 6px", fontFamily: "inherit"}}
           >
             {(Object.keys(NETWORKS) as NetworkId[]).map((id) => (
               <option key={id} value={id}>
@@ -202,7 +203,7 @@ export default function TerminalMint({ network, setNetwork, rpcUrl }: TerminalMi
             ))}
           </select>
         </label>
-        <WalletMultiButton className="wallet-btn" />
+        <WalletMultiButton className="wallet-btn"/>
         {(connected || connecting) && (
           <button
             type="button"
@@ -236,7 +237,8 @@ export default function TerminalMint({ network, setNetwork, rpcUrl }: TerminalMi
         )}
         <span className="term-line">$ минт токена (токены придут на подключённый кошелёк)</span>
         {connected && publicKey && (
-          <span className="term-line term-muted">  → Твой кошелёк: {publicKey.toBase58().slice(0, 12)}…{publicKey.toBase58().slice(-8)}</span>
+          <span
+            className="term-line term-muted">  → Твой кошелёк: {publicKey.toBase58().slice(0, 12)}…{publicKey.toBase58().slice(-8)}</span>
         )}
         <span className="term-line term-muted">  название (для отображения):</span>
         <input
@@ -268,7 +270,8 @@ export default function TerminalMint({ network, setNetwork, rpcUrl }: TerminalMi
         />
         <span className="term-line term-muted">
           {"  URL JSON метаданных (HTTPS, до 200 символов). "}
-          <a href="https://developers.metaplex.com/token-metadata/token-standard#the-fungible-standard" target="_blank" rel="noopener noreferrer" className="term-link">Формат JSON (Metaplex)</a>
+          <a href="https://developers.metaplex.com/token-metadata/token-standard#the-fungible-standard" target="_blank"
+             rel="noopener noreferrer" className="term-link">Формат JSON (Metaplex)</a>
         </span>
         <input
           type="url"
@@ -280,7 +283,7 @@ export default function TerminalMint({ network, setNetwork, rpcUrl }: TerminalMi
         />
         <span className="term-line term-muted">  → Картинка из «URL картинки» уже попадает в наш JSON. Если поле выше пустое, этот JSON уходит как data URI — многие кошельки его не загружают, поэтому картинка может не отображаться. Чтобы показывалась: залей такой же JSON на HTTPS и вставь ссылку сюда.</span>
         <span className="term-line term-muted">  записать имя/тикер/картинку в сеть (Metaplex):</span>
-        <label className="term-line" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <label className="term-line" style={{display: "flex", alignItems: "center", gap: "0.5rem"}}>
           <input
             type="checkbox"
             checked={useMetaplex}
@@ -336,12 +339,13 @@ export default function TerminalMint({ network, setNetwork, rpcUrl }: TerminalMi
         {lastMinted && publicKey && (
           <div className="term-token-card">
             <span className="term-line term-green">  ✓ Токены отминчены на твой кошелёк (ATA)</span>
-            <span className="term-line term-muted">  → Получатель (подписант): {publicKey.toBase58().slice(0, 8)}…{publicKey.toBase58().slice(-8)} — сверь с адресом в кошельке.</span>
+            <span
+              className="term-line term-muted">  → Получатель (подписант): {publicKey.toBase58().slice(0, 8)}…{publicKey.toBase58().slice(-8)} — сверь с адресом в кошельке.</span>
             <span className="term-line term-muted">  → Если токен не виден: добавь токен в кошельке по адресу минта (кнопка ниже).</span>
             <div className="token-card">
               <div className="token-card-icon">
                 {lastMinted.imageUrl ? (
-                  <img src={lastMinted.imageUrl} alt="" className="token-card-img" />
+                  <img src={lastMinted.imageUrl} alt="" className="token-card-img"/>
                 ) : (
                   <span className="token-card-placeholder">{lastMinted.symbol.slice(0, 2)}</span>
                 )}
