@@ -15,3 +15,7 @@ token-minter = { path = "../programs/token_minter", version = "0.1.0" }
 [[example]]
 name = "init-accounts"
 path = "examples/init-accounts.rs"
+
+[[example]]
+name = "get-oracle-pda"
+path = "examples/get-oracle-pda.rs"

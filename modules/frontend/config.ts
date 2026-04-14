@@ -1,16 +1,16 @@
 // Program IDs одинаковы для localnet и devnet (ключи из target/deploy)
-export const ORACLE_PROGRAM_ID = "4cuvLFFqhaKnTHfeq2FtTUvgudRSe7wq982fA9PBUqBU";
-export const MINTER_PROGRAM_ID = "E5erGzaxgCwHqH7RjLXLGWziXj8CXpyN7zW6BRodfFnE";
+export const ORACLE_PROGRAM_ID = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3";
+export const MINTER_PROGRAM_ID = "DXm5uV6Zh3HZshCSUtfoodGDuyDrKnzmP3Nq29PTmYrU";
 
 // Сети и RPC (переключатель на фронте)
 export type NetworkId = "localnet" | "devnet";
 
 export const NETWORKS: Record<NetworkId, { rpc: string; label: string }> = {
-  localnet: { rpc: "http://127.0.0.1:8899", label: "Localnet" },
-  devnet: { rpc: "https://api.devnet.solana.com", label: "Devnet" },
+  localnet: {rpc: "http://127.0.0.1:8899", label: "Localnet"},
+  devnet: {rpc: "https://api.devnet.solana.com", label: "Devnet"},
 };
 
-export const DEFAULT_NETWORK: NetworkId = "localnet";
+export const DEFAULT_NETWORK: NetworkId = "devnet";
 
 /** RPC по умолчанию (для обратной совместимости) */
 export const RPC_URL = NETWORKS[DEFAULT_NETWORK].rpc;

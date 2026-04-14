@@ -7,7 +7,7 @@ pub struct InitializeOracle<'info> {
   #[account(
     init,
     payer = admin,
-    seeds = [OracleState::SEED, admin.key().as_ref()],
+    seeds = [OracleState::SEED],
     bump,
     space = DISCRIMINANT + OracleState::SIZE
   )]

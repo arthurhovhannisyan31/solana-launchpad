@@ -32,14 +32,10 @@ mod test_minter_positive {
     let oracle_program = client.program(oracle_program_id)?;
     let minter_program = client.program(minter_program_id)?;
 
-    let (oracle_pda, _bump) = Pubkey::find_program_address(
-      &[OracleState::SEED, &payer.pubkey().as_ref()],
-      &oracle_program_id,
-    );
-    let (mint_config_pda, mint_config_bump) = Pubkey::find_program_address(
-      &[MinterConfig::SEED, &payer.pubkey().as_ref()],
-      &minter_program_id,
-    );
+    let (oracle_pda, _bump) =
+      Pubkey::find_program_address(&[OracleState::SEED], &oracle_program_id);
+    let (mint_config_pda, mint_config_bump) =
+      Pubkey::find_program_address(&[MinterConfig::SEED], &minter_program_id);
     for (pk, multiplier) in [(&payer.pubkey(), 1), (&treasury.pubkey(), 1)] {
       sync_airdrop(&oracle_program, pk, multiplier)?;
     }

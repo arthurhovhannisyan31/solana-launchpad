@@ -25,5 +25,20 @@ jobs:
         run: |
           ./configs/scripts/cargo-fmt.sh
       #          cargo clippy --quiet
+      - name: Build programs
+        run: anchor build
+      - name: Setup NodeJS
+        uses: ./.github/actions/setup-node
+      - name: Restore dependencies
+        id: restore-dependencies
+        uses: actions/cache@v5
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install Packages
+        if: ${{ steps.restore-dependencies.outputs.cache-hit != 'true' }}
+        run: make install
       - name: Validate unit tests
         run: make test

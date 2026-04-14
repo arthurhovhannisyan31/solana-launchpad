@@ -7,6 +7,7 @@ use anchor_client::{
 use programs_tests::sync_confirm_transaction;
 use sol_usd_oracle::{self, state::OracleState};
 use solana_keypair::read_keypair_file;
+use std::str::FromStr;
 use token_minter::state::MinterConfig;
 
 const INITIAL_PRICE: u64 = 120_000_000;
@@ -17,24 +18,20 @@ fn main() -> anyhow::Result<()> {
   let minter_program_id = "DXm5uV6Zh3HZshCSUtfoodGDuyDrKnzmP3Nq29PTmYrU";
   let payer = read_keypair_file("/home/q/.config/solana/id.json").unwrap();
 
-  let client = Client::new_with_options(
-    Cluster::Localnet,
-    &payer,
-    CommitmentConfig::confirmed(),
-  );
+  let cluster_type = std::env::var("CLUSTER").unwrap_or("localnet".into());
+  let cluster = Cluster::from_str(&cluster_type)?;
+
+  let client =
+    Client::new_with_options(cluster, &payer, CommitmentConfig::confirmed());
   let oracle_program_id = Pubkey::try_from(oracle_program_id)?;
   let minter_program_id = Pubkey::try_from(minter_program_id)?;
   let oracle_program = client.program(oracle_program_id)?;
   let minter_program = client.program(minter_program_id)?;
 
-  let (oracle_pda, _bump) = Pubkey::find_program_address(
-    &[OracleState::SEED, &payer.pubkey().as_ref()],
-    &oracle_program_id,
-  );
-  let (mint_config_pda, mint_config_bump) = Pubkey::find_program_address(
-    &[MinterConfig::SEED, &payer.pubkey().as_ref()],
-    &minter_program_id,
-  );
+  let (oracle_pda, _bump) =
+    Pubkey::find_program_address(&[OracleState::SEED], &oracle_program_id);
+  let (mint_config_pda, mint_config_bump) =
+    Pubkey::find_program_address(&[MinterConfig::SEED], &minter_program_id);
 
   // Initialize oracle
   let signature = oracle_program

@@ -3,31 +3,38 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "remix dev --port 7001",
-    "build": "remix build",
-    "start": "PORT=7001 remix-serve build",
+    "dev": "react-router dev --port 7001",
+    "build": "react-router build",
+    "start": "PORT=7001 react-router-serve ./build/server/index.js",
+    "typecheck": "react-router typegen && tsc",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@remix-run/node": "^2.9.2",
-    "@remix-run/react": "^2.9.2",
-    "@remix-run/serve": "^2.9.2",
+    "@react-router/node": "7.14.0",
+    "@react-router/serve": "7.14.0",
     "@solana/spl-token": "^0.4.14",
     "@solana/wallet-adapter-base": "^0.9.27",
     "@solana/wallet-adapter-react": "^0.15.39",
     "@solana/wallet-adapter-react-ui": "^0.9.39",
-    "@solana/wallet-adapter-wallets": "^0.19.37",
+    "@solana/wallet-adapter-wallets": "^0.19.38",
     "@solana/web3.js": "^1.98.4",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "buffer": "^6.0.3",
+    "isbot": "^5.1.36",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-router": "7.14.0"
   },
   "devDependencies": {
-    "@remix-run/dev": "^2.9.2",
-    "typescript": "^5.6.3",
+    "@react-router/dev": "7.14.0",
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/node": "^22",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "tailwindcss": "^4.2.2",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.3",
     "vitest": "^4.1.0"
   },
-  "engines": {
-    "node": ">=18.0.0"
-  }
+  "packageManager": "yarn@4.13.0"
 }

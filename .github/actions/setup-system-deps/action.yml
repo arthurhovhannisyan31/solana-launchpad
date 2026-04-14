@@ -7,13 +7,5 @@ runs:
     - name: Install Linux dependencies
       run: |
         curl --proto '=https' --tlsv1.2 -sSfL https://solana-install.solana.workers.dev | bash
-        export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
+        echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
       shell: bash
-
-# anchor test
-#error: no such command: `build-sbf`
-#
-#help: view all installed commands with `cargo --list`
-#help: find a package to install `build-sbf` with `cargo search cargo-build-sbf`
-#make: *** [Makefile:65: test] Error 101
-#Error: Process completed with exit code 2.
