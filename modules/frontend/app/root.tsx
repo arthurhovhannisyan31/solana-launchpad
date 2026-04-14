@@ -3,7 +3,6 @@ import stylesheetUrl from "./styles/app.css?url";
 import walletAdapterStylesUrl from "./styles/wallet-adapter-ui.css?url";
 import type {Route} from "./+types/root";
 import "./app.css";
-
 import {Buffer} from 'buffer';
 
 if (typeof window === "object") {

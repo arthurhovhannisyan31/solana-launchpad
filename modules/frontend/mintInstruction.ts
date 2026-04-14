@@ -1,22 +1,13 @@
+import {ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID,} from "@solana/spl-token";
+import {Keypair, PublicKey, SystemProgram, TransactionInstruction,} from "@solana/web3.js";
 import {
-  getAssociatedTokenAddressSync,
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
-import {
-  Keypair,
-  PublicKey,
-  SystemProgram,
-  TransactionInstruction,
-} from "@solana/web3.js";
-import {
+  METADATA_SEED,
+  MINT_TOKEN_DISCRIMINATOR,
   MINTER_PROGRAM_ID,
+  MINTER_SEED,
   MPL_TOKEN_METADATA_PROGRAM_ID,
   ORACLE_PROGRAM_ID,
   ORACLE_SEED,
-  MINTER_SEED,
-  METADATA_SEED,
-  MINT_TOKEN_DISCRIMINATOR,
 } from "./config";
 
 const ORACLE_PK = new PublicKey(ORACLE_PROGRAM_ID);
@@ -45,15 +36,15 @@ type BuildMintTokenInstructionArgs = {
 };
 
 export function buildMintTokenInstruction({
-  user,
-  mintKeypair,
-  treasury,
-  decimals,
-  initialSupply,
-  name,
-  symbol,
-  uri,
-}: BuildMintTokenInstructionArgs): TransactionInstruction {
+                                            user,
+                                            mintKeypair,
+                                            treasury,
+                                            decimals,
+                                            initialSupply,
+                                            name,
+                                            symbol,
+                                            uri,
+                                          }: BuildMintTokenInstructionArgs): TransactionInstruction {
   const [configPda] = PublicKey.findProgramAddressSync([MINTER_SEED], MINTER_PK);
   const [oraclePda] = PublicKey.findProgramAddressSync([ORACLE_SEED], ORACLE_PK);
   const [metadataPda] = PublicKey.findProgramAddressSync(
@@ -77,22 +68,27 @@ export function buildMintTokenInstruction({
   off += symbolEnc.length;
   data.set(uriEnc, off);
 
+  console.log({
+    configPda,
+    oraclePda,
+  })
+
   return new TransactionInstruction({
     programId: MINTER_PK,
     keys: [
-      { pubkey: configPda, isSigner: false, isWritable: true },
-      { pubkey: user, isSigner: true, isWritable: true },
-      { pubkey: treasury, isSigner: false, isWritable: true },
-      { pubkey: ORACLE_PK, isSigner: false, isWritable: false },
-      { pubkey: oraclePda, isSigner: false, isWritable: false },
-      { pubkey: mintKeypair.publicKey, isSigner: true, isWritable: true },
-      { pubkey: userAta, isSigner: false, isWritable: true },
-      { pubkey: MPL_METADATA_PK, isSigner: false, isWritable: false },
-      { pubkey: metadataPda, isSigner: false, isWritable: true },
-      { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-      { pubkey: ASSOCIATED_TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-      { pubkey: SYSVAR_RENT, isSigner: false, isWritable: false },
+      {pubkey: configPda, isSigner: false, isWritable: true},
+      {pubkey: user, isSigner: true, isWritable: true},
+      {pubkey: treasury, isSigner: false, isWritable: true},
+      {pubkey: ORACLE_PK, isSigner: false, isWritable: false},
+      {pubkey: oraclePda, isSigner: false, isWritable: false},
+      {pubkey: mintKeypair.publicKey, isSigner: true, isWritable: true},
+      {pubkey: userAta, isSigner: false, isWritable: true},
+      {pubkey: MPL_METADATA_PK, isSigner: false, isWritable: false},
+      {pubkey: metadataPda, isSigner: false, isWritable: true},
+      {pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false},
+      {pubkey: ASSOCIATED_TOKEN_PROGRAM_ID, isSigner: false, isWritable: false},
+      {pubkey: SystemProgram.programId, isSigner: false, isWritable: false},
+      {pubkey: SYSVAR_RENT, isSigner: false, isWritable: false},
     ],
     data,
   });

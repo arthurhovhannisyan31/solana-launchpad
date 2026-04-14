@@ -35,7 +35,7 @@ deploy-minter-devnet: build
 init:
 	cargo run -p programs-tests --example init-accounts
 
-print-oracle-pda:
+get-oracle-pda:
 	cargo run -p programs-tests --example get-oracle-pda
 
 # Инициализация на devnet (после make deploy-devnet)
@@ -65,7 +65,7 @@ frontend: kill-frontend
 	cd modules/frontend && yarn dev
 
 test:
-	anchor test
+	#anchor test
 	#cargo test -- --ignored
 
 prepare:

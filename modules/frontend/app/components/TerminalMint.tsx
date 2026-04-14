@@ -95,12 +95,6 @@ export default function TerminalMint({network, setNetwork, rpcUrl}: TerminalMint
   const [lastMinted, setLastMinted] = useState<MintedToken | null>(null);
 
   const handleMint = useCallback(async () => {
-    console.log({
-      publicKey,
-      treasury,
-      oraclePrice,
-    })
-
     if (!publicKey || !treasury || oraclePrice == null || oraclePrice === 0) {
       setTxStatus("Оракул или казна не готовы.");
       return;

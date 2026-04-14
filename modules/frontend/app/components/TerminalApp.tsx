@@ -1,3 +1,5 @@
+"use client";
+
 import {useMemo, useState} from "react";
 import {ConnectionProvider, WalletProvider} from "@solana/wallet-adapter-react";
 import {DEFAULT_NETWORK, type NetworkId, NETWORKS} from "../../config";
