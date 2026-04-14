@@ -1,26 +1,34 @@
+> Результаты проектной работы отображены в файле [RESULTS.TXT](./RESULTS.txt)
+
 # Solana Mini Launchpad
 
-Учебный мини-лаунчпад на Solana + Anchor: два on-chain контракта (SOL/USD oracle и token minter), Rust backend для обновления цены и прослушки событий, а также Remix фронтенд (папка `frontend/`).
+Учебный мини-лаунчпад на Solana + Anchor: два on-chain контракта (SOL/USD oracle и token minter), Rust backend для
+обновления цены и прослушки событий, а также Remix фронтенд (папка `frontend/`).
 
 ## Структура
-- `program/` — Anchor workspace  
-  - `programs/sol_usd_oracle` — хранит цену SOL/USD (decimals = 6)  
-  - `programs/token_minter` — минтит SPL токены за комиссию в SOL, используя цену из oracle  
-  - `tests/` — Anchor TS тесты  
+
+- `program/` — Anchor workspace
+    - `programs/sol_usd_oracle` — хранит цену SOL/USD (decimals = 6)
+    - `programs/token_minter` — минтит SPL токены за комиссию в SOL, используя цену из oracle
+    - `tests/` — Anchor TS тесты
 - `backend/` — Rust сервис, который обновляет цену и слушает события `TokenCreated`
 - `frontend/` — Remix hello-world (React Router)
 
 ## Быстрый старт (локально)
 
-1. **Validator**: запустить `solana-test-validator` (или `make validator`). Для отображения имени, тикера и картинки токена в кошельке используйте валидатор с клоном Metaplex: `make validator-metaplex` (клон программы Token Metadata с mainnet). Убедитесь, что `~/.config/solana/id.json` есть и профинансирован (`solana airdrop 1000` при необходимости).
+1. **Validator**: запустить `solana-test-validator` (или `make validator`). Для отображения имени, тикера и картинки
+   токена в кошельке используйте валидатор с клоном Metaplex: `make validator-metaplex` (клон программы Token Metadata с
+   mainnet). Убедитесь, что `~/.config/solana/id.json` есть и профинансирован (`solana airdrop 1000` при необходимости).
 
-2. **Программы**: собрать и задеплоить (ID программ берутся из keypair в `program/target/deploy/`; при первом деплое выполните `anchor keys sync`, затем пересоберите):
+2. **Программы**: собрать и задеплоить (ID программ берутся из keypair в `program/target/deploy/`; при первом деплое
+   выполните `anchor keys sync`, затем пересоберите):
    ```bash
    make build
    make deploy
    ```
 
-3. **Инициализация**: один раз после деплоя инициализировать oracle и minter (скрипт выведет `ORACLE_STATE_PUBKEY` для `.env`):
+3. **Инициализация**: один раз после деплоя инициализировать oracle и minter (скрипт выведет `ORACLE_STATE_PUBKEY` для
+   `.env`):
    ```bash
    make init
    ```
@@ -45,9 +53,11 @@
    make init-devnet
    ```
 
-4. В приложении выбрать сеть **Devnet**, в кошельке переключиться на Devnet — можно минтить. На devnet Metaplex уже есть, картинка в кошельке может отображаться (если URI доступен по HTTPS).
+4. В приложении выбрать сеть **Devnet**, в кошельке переключиться на Devnet — можно минтить. На devnet Metaplex уже
+   есть, картинка в кошельке может отображаться (если URI доступен по HTTPS).
 
-4. **Backend**: скопировать `backend/.env.example` в `backend/.env`, подставить `ORACLE_STATE_PUBKEY` из вывода init-скрипта. Путь `BACKEND_KEYPAIR_PATH` поддерживает `~`:
+4. **Backend**: скопировать `backend/.env.example` в `backend/.env`, подставить `ORACLE_STATE_PUBKEY` из вывода
+   init-скрипта. Путь `BACKEND_KEYPAIR_PATH` поддерживает `~`:
    ```bash
    cd backend
    cargo run
@@ -59,7 +69,8 @@
    cd frontend
    npm install && npm run dev
    ```
-  Открыть http://localhost:7001.
+
+Открыть http://localhost:7001.
 
 6. **Тесты** (LiteSVM, без сети):
    ```bash
@@ -71,6 +82,7 @@
 ## Переменные окружения для backend
 
 См. `backend/.env.example`. Основные:
+
 - `SOLANA_RPC_HTTP`, `SOLANA_RPC_WS` — RPC локального валидатора или devnet/mainnet.
 - `ORACLE_PROGRAM_ID`, `MINTER_PROGRAM_ID` — из `anchor keys list` (после деплоя).
 - `ORACLE_STATE_PUBKEY` — PDA от seed `"oracle_state"`; выводится скриптом `program/scripts/init-local.js`.
@@ -79,14 +91,17 @@
 
 ## Метаданные токена (Metaplex)
 
-При минте можно передать `name`, `symbol` и `uri` — контракт создаёт запись Metaplex Token Metadata (имя, тикер, картинка в кошельке). Если передать пустое имя, метаданные не создаются (подходит для localnet без Metaplex). Для отображения в кошельке поднимайте валидатор с клоном Metaplex: `make validator-metaplex`, затем деплой и `init` как обычно.
+При минте можно передать `name`, `symbol` и `uri` — контракт создаёт запись Metaplex Token Metadata (имя, тикер,
+картинка в кошельке). Если передать пустое имя, метаданные не создаются (подходит для localnet без Metaplex). Для
+отображения в кошельке поднимайте валидатор с клоном Metaplex: `make validator-metaplex`, затем деплой и `init` как
+обычно.
 
 ## Основные ограничения
+
 - Все вычисления комиссии — integer math, `fee_lamports = mint_fee_usd * LAMPORTS_PER_SOL / price`.
 - Oracle price и mint_fee_usd хранятся с точностью 10^6.
 - Доступ к `update_price` только у oracle admin (backend keypair).
 - `mint_token` падает, если `price == 0` или fee/supply некорректны.
-
 
 ---
 
