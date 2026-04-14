@@ -10,17 +10,17 @@ import {fileURLToPath} from "url";
 import BN from "bn.js";
 
 const require = createRequire(import.meta.url);
-const oracleIdl = require("../target/idl/sol_usd_oracle.json");
-const minterIdl = require("../target/idl/token_minter.json");
+const oracleIdl = require("../../../target/idl/sol_usd_oracle.json");
+const minterIdl = require("../../../target/idl/token_minter.json");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const ORACLE_PROGRAM_ID = new PublicKey("4cuvLFFqhaKnTHfeq2FtTUvgudRSe7wq982fA9PBUqBU");
-const MINTER_PROGRAM_ID = new PublicKey("E5erGzaxgCwHqH7RjLXLGWziXj8CXpyN7zW6BRodfFnE");
+const ORACLE_PROGRAM_ID = new PublicKey("24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3");
+const MINTER_PROGRAM_ID = new PublicKey("DXm5uV6Zh3HZshCSUtfoodGDuyDrKnzmP3Nq29PTmYrU");
 
-const ORACLE_SO = path.resolve(__dirname, "../target/deploy/sol_usd_oracle.so");
-const MINTER_SO = path.resolve(__dirname, "../target/deploy/token_minter.so");
+const ORACLE_SO = path.resolve(__dirname, "../../../target/deploy/sol_usd_oracle.so");
+const MINTER_SO = path.resolve(__dirname, "../../../target/deploy/token_minter.so");
 
 const ORACLE_SEED = Buffer.from("oracle_state");
 const MINTER_SEED = Buffer.from("minter_config");
@@ -56,6 +56,21 @@ function buildTx(ixs: TransactionInstruction[], feePayer: Keypair, svm: LiteSVM)
   tx.add(...ixs);
   tx.sign(...[feePayer, ...ixs.flatMap((ix) => (ix as any)._additionalSigners ?? [])]);
   return tx;
+}
+
+function compute_fee_lamports(mint_fee_usd: BN, price: BN): number {
+  if (price.toNumber() <= 0) {
+    throw "Math overflow while computing fee";
+  }
+
+  const fee = mint_fee_usd;
+  const lps = new BN(anchor.web3.LAMPORTS_PER_SOL);
+
+  let converted_fee = fee.mul(lps);
+
+  let fee_lamports_u128 = converted_fee.div(price);
+
+  return fee_lamports_u128.toNumber()
 }
 
 describe("token_minter (LiteSVM)", () => {
@@ -162,9 +177,10 @@ describe("token_minter (LiteSVM)", () => {
     assertSuccess(res);
 
     const treasuryAfter = svm.getBalance(treasury.publicKey) ?? BigInt(0);
-    // TODO(student): this formula is intentionally broken.
-    // The fee should get smaller when SOL/USD price gets larger.
-    const expectedFee = PRICE.mul(new BN(anchor.web3.LAMPORTS_PER_SOL)).div(FEE_USD);
+    const expectedFee = compute_fee_lamports(
+      FEE_USD,
+      PRICE,
+    );
     expect(treasuryAfter - treasuryBefore).to.eq(BigInt(expectedFee.toString()));
 
     const mintAcct = svm.getAccount(mintKeypair.publicKey);

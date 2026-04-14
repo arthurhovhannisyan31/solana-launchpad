@@ -17,6 +17,10 @@ mod test_minter_positive {
   use token_minter::state::MinterConfig;
   use token_minter::utils::{calc_amount_raw, compute_fee_lamports};
 
+  const ORACLE_PRICE: u64 = 100;
+  const MINT_FEE_USD: u64 = 1000;
+  const MINT_INITIAL_SUPPLY: u64 = 1_000_000;
+
   #[test]
   fn test() -> anyhow::Result<()> {
     let oracle_program_id = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3";
@@ -44,9 +48,6 @@ mod test_minter_positive {
       Pubkey::find_program_address(&[OracleState::SEED], &oracle_program_id);
     let (mint_config_pda, mint_config_bump) =
       Pubkey::find_program_address(&[MinterConfig::SEED], &minter_program_id);
-    let oracle_price: u64 = 100;
-    let mint_fee_usd: u64 = 1000;
-    let mint_initial_supply: u64 = 1_000_000;
 
     for (pk, multiplier) in [(&payer.pubkey(), 100), (&treasury.pubkey(), 1)] {
       sync_airdrop(&oracle_program, pk, multiplier)?;
@@ -74,7 +75,7 @@ mod test_minter_positive {
         oracle: oracle_pda,
       })
       .args(sol_usd_oracle::instruction::UpdatePrice {
-        new_price: oracle_price,
+        new_price: ORACLE_PRICE,
       })
       .send()?;
 
@@ -90,7 +91,7 @@ mod test_minter_positive {
       })
       .args(token_minter::instruction::InitializeMinter {
         treasury: treasury.pubkey(),
-        mint_fee_usd,
+        mint_fee_usd: MINT_FEE_USD,
         oracle_state: oracle_pda,
         oracle_program: sol_usd_oracle::ID,
       })
@@ -103,7 +104,7 @@ mod test_minter_positive {
 
     assert_eq!(minter_config.treasury, treasury.pubkey());
     assert_eq!(minter_config.admin, payer.pubkey());
-    assert_eq!(minter_config.mint_fee_usd, mint_fee_usd);
+    assert_eq!(minter_config.mint_fee_usd, MINT_FEE_USD);
     assert_eq!(minter_config.oracle_program, sol_usd_oracle::ID);
     assert_eq!(minter_config.oracle_state, oracle_pda);
     assert_eq!(minter_config.bump, mint_config_bump);
@@ -112,7 +113,7 @@ mod test_minter_positive {
     let treasury_balance_before =
       minter_program.rpc().get_balance(&treasury.pubkey())?;
     let initial_supply: u64 =
-      calc_amount_raw(mint_initial_supply, oracle_state.decimals)?;
+      calc_amount_raw(MINT_INITIAL_SUPPLY, oracle_state.decimals)?;
 
     let signature = minter_program
       .request()
@@ -148,7 +149,7 @@ mod test_minter_positive {
     let transfer_amount = treasury_balance_after - treasury_balance_before;
     assert_eq!(
       transfer_amount,
-      compute_fee_lamports(mint_fee_usd, oracle_state.price)?
+      compute_fee_lamports(MINT_FEE_USD, oracle_state.price)?
     );
 
     let mint_account = minter_program.rpc().get_account(&mint.pubkey())?;
@@ -161,7 +162,7 @@ mod test_minter_positive {
     assert_eq!(mint_data.freeze_authority.unwrap(), payer.pubkey());
     assert_eq!(
       mint_data.supply,
-      calc_amount_raw(mint_initial_supply, oracle_state.decimals)?
+      calc_amount_raw(MINT_INITIAL_SUPPLY, oracle_state.decimals)?
     );
     assert_eq!(mint_data.decimals, oracle_state.decimals);
     assert_eq!(mint_data.is_initialized, true);
