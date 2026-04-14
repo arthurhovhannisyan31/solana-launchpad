@@ -7,7 +7,7 @@ pub struct InitializeMinter<'info> {
   #[account(
     init,
     payer = admin,
-    seeds = [MinterConfig::SEED, admin.key().as_ref()],
+    seeds = [MinterConfig::SEED],
     bump,
     space = DISCRIMINANT + MinterConfig::SIZE
   )]

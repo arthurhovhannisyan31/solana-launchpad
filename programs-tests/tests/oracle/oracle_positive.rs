@@ -25,10 +25,8 @@ mod test_oracle_positive {
     let program_id = Pubkey::try_from(program_id)?;
     let program = client.program(program_id)?;
 
-    let (oracle_pda, bump) = Pubkey::find_program_address(
-      &[OracleState::SEED, &payer.pubkey().as_ref()],
-      &program_id,
-    );
+    let (oracle_pda, bump) =
+      Pubkey::find_program_address(&[OracleState::SEED], &program_id);
 
     sync_airdrop(&program, &payer.pubkey(), 1)?;
 

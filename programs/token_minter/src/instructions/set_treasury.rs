@@ -6,7 +6,7 @@ use crate::MinterConfig;
 pub struct SetTreasury<'info> {
   #[account(
     mut,
-    seeds = [MinterConfig::SEED, admin.key().as_ref()],
+    seeds = [MinterConfig::SEED],
     bump = config.bump,
     has_one = admin
   )]
