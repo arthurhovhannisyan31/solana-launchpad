@@ -17,8 +17,6 @@ pub fn update_price(ctx: Context<UpdatePrice>, new_price: u64) -> Result<()> {
   require!(new_price > 0, OracleError::InvalidPrice);
 
   let oracle = &mut ctx.accounts.oracle;
-  // TODO Replace with
-  // constraint = config.oracle_state == oracle_state.key() @ MinterError::InvalidOracleState
   require_keys_eq!(
     ctx.accounts.admin.key(),
     oracle.admin,

@@ -6,7 +6,7 @@ mod test_oracle_negative {
     solana_sdk::signature::Signer, Client, Cluster,
   };
   use programs_tests::{sync_airdrop, sync_confirm_transaction};
-  use sol_usd_oracle::constants::PRICE_DECIMALS;
+  use sol_usd_oracle::constants::{MAX_STALENESS_SLOTS, PRICE_DECIMALS};
   use sol_usd_oracle::{accounts, instruction, state::OracleState};
   use solana_keypair::Keypair;
 
@@ -105,6 +105,26 @@ mod test_oracle_negative {
     assert_eq!(oracle_state.price, init_price);
     assert_eq!(oracle_state.admin, payer.pubkey());
     assert_eq!(oracle_state.decimals, PRICE_DECIMALS);
+
+    // Reset oracle last updated value
+    let cur_slot = program.rpc().get_slot()?;
+
+    program
+      .request()
+      .accounts(accounts::ResetOracle { oracle: oracle_pda })
+      .args(instruction::ResetOracle {
+        new_slot: cur_slot.saturating_sub(MAX_STALENESS_SLOTS + 1),
+      })
+      .send()?;
+
+    // Use stale oracle data
+    let res = program
+      .request()
+      .accounts(accounts::UseOracle { oracle: oracle_pda })
+      .args(instruction::UseOracle {})
+      .send();
+
+    assert!(res.is_err());
 
     Ok(())
   }

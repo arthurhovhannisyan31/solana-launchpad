@@ -6,4 +6,6 @@ pub enum OracleError {
   Unauthorized,
   #[msg("Price must be greater than zero")]
   InvalidPrice,
+  #[msg("Oracle data is stale")]
+  StaleOracle,
 }
