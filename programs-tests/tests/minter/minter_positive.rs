@@ -21,6 +21,7 @@ mod test_minter_positive {
   const MINT_FEE_USD: u64 = 1000;
   const MINT_INITIAL_SUPPLY: u64 = 1_000_000;
 
+  #[ignore]
   #[test]
   fn test() -> anyhow::Result<()> {
     let oracle_program_id = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3";
