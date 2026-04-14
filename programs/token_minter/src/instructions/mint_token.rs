@@ -6,7 +6,11 @@ use mpl_token_metadata::{
   instructions::CreateMetadataAccountV3CpiBuilder, types::DataV2,
   ID as MPL_TOKEN_METADATA_ID,
 };
-use sol_usd_oracle::{constants::PRICE_DECIMALS, state::OracleState};
+use sol_usd_oracle::{
+  constants::{MAX_STALENESS_SLOTS, PRICE_DECIMALS},
+  error::OracleError,
+  state::OracleState,
+};
 
 #[derive(Accounts)]
 #[instruction(decimals: u8, initial_supply: u64)]
@@ -74,11 +78,7 @@ pub fn mint_token(
   );
 
   let oracle_state = &ctx.accounts.oracle_state;
-  require!(oracle_state.price > 0, MinterError::OraclePriceZero);
-  require!(
-    oracle_state.decimals == PRICE_DECIMALS,
-    MinterError::OracleDecimalsMismatch
-  );
+  validate_oracle(&ctx.accounts.oracle_state)?;
 
   let fee_lamports =
     compute_fee_lamports(ctx.accounts.config.mint_fee_usd, oracle_state.price)?;
@@ -169,6 +169,20 @@ pub fn mint_token(
     sol_usd_price: oracle_state.price,
     slot: Clock::get()?.slot,
   });
+
+  Ok(())
+}
+
+fn validate_oracle(oracle_state: &Account<OracleState>) -> Result<()> {
+  let slot = Clock::get()?.slot;
+  let age = slot.saturating_sub(oracle_state.last_updated_slot);
+
+  require!(age <= MAX_STALENESS_SLOTS, OracleError::StaleOracle);
+  require!(oracle_state.price > 0, MinterError::OraclePriceZero);
+  require!(
+    oracle_state.decimals == PRICE_DECIMALS,
+    MinterError::OracleDecimalsMismatch
+  );
 
   Ok(())
 }
