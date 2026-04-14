@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod test_minter_positive {
+mod test_minter_negative {
   use anchor_client::anchor_lang::prelude::sysvar::SysvarId;
   use anchor_client::anchor_lang::prelude::{system_program, Rent};
   use anchor_client::{
