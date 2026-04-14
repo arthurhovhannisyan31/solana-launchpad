@@ -10,7 +10,7 @@ export const NETWORKS: Record<NetworkId, { rpc: string; label: string }> = {
   devnet: {rpc: "https://api.devnet.solana.com", label: "Devnet"},
 };
 
-export const DEFAULT_NETWORK: NetworkId = "localnet";
+export const DEFAULT_NETWORK: NetworkId = "devnet";
 
 /** RPC по умолчанию (для обратной совместимости) */
 export const RPC_URL = NETWORKS[DEFAULT_NETWORK].rpc;
