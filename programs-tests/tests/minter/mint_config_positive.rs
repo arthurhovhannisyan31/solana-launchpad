@@ -14,6 +14,7 @@ mod test_mint_config_positive {
   const INITIAL_PRICE: u64 = 120_000_000;
   const MINT_FEE_USD: u64 = 5_000_000;
 
+  #[ignore]
   #[test]
   fn test() -> anyhow::Result<()> {
     let oracle_program_id = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3";

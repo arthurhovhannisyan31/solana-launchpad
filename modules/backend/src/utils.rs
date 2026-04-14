@@ -234,7 +234,6 @@ mod tests {
     }
   }
 
-  #[ignore]
   #[test]
   fn to_fixed_6_parses_integer_and_fractional_part() {
     assert_eq!(to_fixed_6("120").unwrap(), 120_000_000);
@@ -242,19 +241,16 @@ mod tests {
     assert_eq!(to_fixed_6("0.000001").unwrap(), 1);
   }
 
-  #[ignore]
   #[test]
   fn to_fixed_6_truncates_fraction_to_six_digits() {
     assert_eq!(to_fixed_6("1.1234569").unwrap(), 1_123_457);
   }
 
-  #[ignore]
   #[test]
   fn to_fixed_6_rejects_invalid_input() {
     assert!(to_fixed_6("abc").is_err());
   }
 
-  #[ignore]
   #[test]
   fn parse_token_created_reads_expected_fields() {
     let logs = RpcLogsResponse {
@@ -276,7 +272,6 @@ mod tests {
     assert_eq!(parsed.signature, logs.signature);
   }
 
-  #[ignore]
   #[test]
   fn parse_token_created_returns_none_for_unrelated_logs() {
     let logs = RpcLogsResponse {
@@ -287,7 +282,6 @@ mod tests {
     assert!(parse_token_created(&logs, Pubkey::new_unique()).is_none());
   }
 
-  #[ignore]
   #[test]
   fn price_source_prefers_mock_over_url() {
     let cfg = sample_cfg(Some(123), Some("https://example.com/price"));
@@ -298,7 +292,6 @@ mod tests {
     }
   }
 
-  #[ignore]
   #[test]
   fn price_source_uses_default_url_when_no_override() {
     let cfg = sample_cfg(None, None);

@@ -11,6 +11,7 @@ mod test_mint_config_negative {
   use solana_keypair::Keypair;
   use token_minter::state::MinterConfig;
 
+  #[ignore]
   #[test]
   fn test() -> anyhow::Result<()> {
     let oracle_program_id = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3";

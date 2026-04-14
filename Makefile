@@ -66,8 +66,9 @@ frontend: kill-frontend
 
 test:
 	cd programs-tests && yarn run ts-mocha -p ./tsconfig.json -t 1000000 "tests/**/*.ts"
-	#anchor test
-	#cargo test -- --ignored
+	cargo test
+	#anchor test WIP
+
 
 prepare:
 	./configs/git/setup.sh

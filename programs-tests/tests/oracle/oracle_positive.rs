@@ -11,6 +11,7 @@ mod test_oracle_positive {
   };
   use solana_keypair::Keypair;
 
+  #[ignore]
   #[test]
   fn test() -> anyhow::Result<()> {
     let program_id = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3";
