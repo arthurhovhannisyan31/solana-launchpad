@@ -1,4 +1,13 @@
-> Результаты проектной работы отображены в файле [RESULTS.TXT](./RESULTS.txt)
+# Результаты проектной работы
+
+| Type                      | Address                                                                                                                                         |
+|---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| Oracle Program Account    | [24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3](https://explorer.solana.com/address/24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3?cluster=devnet) |
+| Oracle PDA                | [Ar5F9ANZhkjdt8ocKyPacpXLzoD7hD8Hga5wZ9UBAN3t](https://explorer.solana.com/address/Ar5F9ANZhkjdt8ocKyPacpXLzoD7hD8Hga5wZ9UBAN3t?cluster=devnet) |
+| Launchpad Program Account | [DXm5uV6Zh3HZshCSUtfoodGDuyDrKnzmP3Nq29PTmYrU](https://explorer.solana.com/address/DXm5uV6Zh3HZshCSUtfoodGDuyDrKnzmP3Nq29PTmYrU?cluster=devnet) |
+| Minted token              | [25vKabXvPnrFnyz2TAyWkErrjJDQF3Y3VAxRe15orBz7](https://explorer.solana.com/address/25vKabXvPnrFnyz2TAyWkErrjJDQF3Y3VAxRe15orBz7?cluster=devnet) |
+| Minted token              | [heb8v9kEmnNNVYsLyuApbRTUTyPmTfkdyGo9WutsfrJ](https://explorer.solana.com/address/heb8v9kEmnNNVYsLyuApbRTUTyPmTfkdyGo9WutsfrJ?cluster=devnet)   |
+| Minted token              | [Dta8nyRNEFsSMT7A9emgurmyCRE2FsBa8yeshDdgxZJD](https://explorer.solana.com/address/Dta8nyRNEFsSMT7A9emgurmyCRE2FsBa8yeshDdgxZJD?cluster=devnet) |
 
 # Solana Mini Launchpad
 
@@ -112,3 +121,4 @@
 3. `cd program && node scripts/init-local.js` — скопировать `ORACLE_STATE_PUBKEY` в `backend/.env`
 4. `cd backend && cargo run`
 5. `cd frontend && npm run dev` — открыть в браузере и покликать.
+
