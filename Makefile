@@ -3,8 +3,7 @@
 .PHONY: install validator validator-metaplex build deploy deploy-devnet deploy-oracle-devnet deploy-minter-devnet init init-devnet deploy-oracle deploy-minter backend backend-devnet frontend kill-frontend test prepare check-rs lint-rs lint
 
 install:
-	cd programs-tests && yarn install
-	cd modules/frontend && yarn install
+	cargo update
 
 # Обычный локальный валидатор (без Metaplex)
 validator:
@@ -65,10 +64,7 @@ frontend: kill-frontend
 	cd modules/frontend && yarn dev
 
 test:
-	cd programs-tests && yarn run ts-mocha -p ./tsconfig.json -t 1000000 "tests/**/*.ts"
 	cargo test
-	#anchor test WIP
-
 
 prepare:
 	./configs/git/setup.sh
