@@ -177,7 +177,7 @@ fn validate_oracle(oracle_state: &Account<OracleState>) -> Result<()> {
   let slot = Clock::get()?.slot;
   let age = slot.saturating_sub(oracle_state.last_updated_slot);
 
-  require!(age <= MAX_STALENESS_SLOTS, OracleError::StaleOracle);
+  require!(age < MAX_STALENESS_SLOTS, OracleError::StaleOracle);
   require!(oracle_state.price > 0, MinterError::OraclePriceZero);
   require!(
     oracle_state.decimals == PRICE_DECIMALS,
