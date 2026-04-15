@@ -15,7 +15,7 @@ pub fn use_oracle(ctx: Context<UseOracle>) -> Result<()> {
   let slot = Clock::get()?.slot;
   let age = slot.saturating_sub(oracle.last_updated_slot);
 
-  require!(age <= MAX_STALENESS_SLOTS, OracleError::StaleOracle);
+  require!(age < MAX_STALENESS_SLOTS, OracleError::StaleOracle);
 
   Ok(())
 }
