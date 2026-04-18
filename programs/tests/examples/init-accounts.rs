@@ -4,10 +4,10 @@ use anchor_client::{
   solana_sdk::commitment_config::CommitmentConfig,
   solana_sdk::signature::Signer, Client, Cluster,
 };
-use programs_tests::sync_confirm_transaction;
 use sol_usd_oracle::{self, state::OracleState};
 use solana_keypair::read_keypair_file;
 use std::str::FromStr;
+use tests::sync_confirm_transaction;
 use token_minter::state::MinterConfig;
 
 const INITIAL_PRICE: u64 = 120_000_000;

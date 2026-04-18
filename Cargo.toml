@@ -2,7 +2,7 @@
 members = [
   "programs/sol_usd_oracle",
   "programs/token_minter",
-  "programs-tests",
+  "programs/tests",
   "modules/backend",
 ]
 resolver = "2"

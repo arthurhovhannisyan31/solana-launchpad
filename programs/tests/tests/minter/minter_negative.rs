@@ -1,36 +1,46 @@
-use anchor_lang::prelude::{instruction::Instruction, system_program, Pubkey};
+use anchor_lang::prelude::{
+  instruction::Instruction, system_program, sysvar::SysvarId, Pubkey, Rent,
+};
 use anchor_lang::{AccountDeserialize, InstructionData, ToAccountMetas};
+use anchor_spl::{associated_token, token};
 use litesvm::LiteSVM;
-use sol_usd_oracle::{self, state::OracleState};
+use sol_usd_oracle::{self, constants::PRICE_DECIMALS, state::OracleState};
 use solana_sdk::{
   signature::{Keypair, Signer},
   transaction::Transaction,
 };
 use token_minter::state::MinterConfig;
+use token_minter::utils::calc_amount_raw;
 
 const ORACLE_PRICE: u64 = 100;
 const MINT_FEE_USD: u64 = 1000;
+const MINT_INITIAL_SUPPLY: u64 = 1_000_000;
 
 #[test]
-fn test_mint_config_positive() -> anyhow::Result<()> {
+fn test_minter_positive() -> anyhow::Result<()> {
   let mut svm = LiteSVM::new();
 
   let oracle_program_id =
     "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3".parse::<Pubkey>()?;
   svm.add_program_from_file(
     oracle_program_id,
-    "../target/deploy/sol_usd_oracle.so",
+    "../../target/deploy/sol_usd_oracle.so",
   )?;
 
   let minter_program_id =
     "DXm5uV6Zh3HZshCSUtfoodGDuyDrKnzmP3Nq29PTmYrU".parse::<Pubkey>()?;
   svm.add_program_from_file(
     minter_program_id,
-    "../target/deploy/token_minter.so",
+    "../../target/deploy/token_minter.so",
   )?;
 
   let payer = Keypair::new();
   let treasury = Keypair::new();
+  let mint = Keypair::new();
+  let user_ata = associated_token::get_associated_token_address(
+    &payer.pubkey(),
+    &mint.pubkey(),
+  );
   let (oracle_pda, _bump) =
     Pubkey::find_program_address(&[OracleState::SEED], &oracle_program_id);
   let (mint_config_pda, mint_config_bump) =
@@ -93,6 +103,9 @@ fn test_mint_config_positive() -> anyhow::Result<()> {
     .send_transaction(tx)
     .map_err(|e| anyhow::anyhow!("{:#?}", e))?;
 
+  let account = svm.get_account(&oracle_pda).unwrap();
+  let oracle_state = OracleState::try_deserialize(&mut &account.data[..])?;
+
   // 3. Initialize mint config account
   let init_minter_ix = Instruction {
     program_id: minter_program_id,
@@ -122,90 +135,75 @@ fn test_mint_config_positive() -> anyhow::Result<()> {
     .send_transaction(tx)
     .map_err(|e| anyhow::anyhow!("{:#?}", e))?;
 
-  let account = svm.get_account(&mint_config_pda).unwrap();
-  let minter_config = MinterConfig::try_deserialize(&mut &account.data[..])?;
+  // 4. Rejects mint creation if supply is zero
+  let treasury_balance_before = svm.get_balance(&treasury.pubkey()).unwrap();
+  let initial_supply: u64 =
+    calc_amount_raw(MINT_INITIAL_SUPPLY, oracle_state.decimals)?;
 
-  assert_eq!(minter_config.treasury, treasury.pubkey());
-  assert_eq!(minter_config.admin, payer.pubkey());
-  assert_eq!(minter_config.mint_fee_usd, MINT_FEE_USD);
-  assert_eq!(minter_config.oracle_program, sol_usd_oracle::ID);
-  assert_eq!(minter_config.oracle_state, oracle_pda);
-  assert_eq!(minter_config.bump, mint_config_bump);
-
-  // 4. Mint config set new fee
-  let new_fee_usd: u64 = 10;
-  let set_fee_usd_ix = Instruction {
-    program_id: minter_program_id,
-    accounts: token_minter::accounts::SetFeeUsd {
-      admin: payer.pubkey(),
-      config: mint_config_pda,
-    }
-    .to_account_metas(None),
-    data: token_minter::instruction::SetFeeUsd { new_fee_usd }.data(),
+  let mint_token_acc = token_minter::accounts::MintToken {
+    config: mint_config_pda,
+    user: payer.pubkey(),
+    treasury: treasury.pubkey(),
+    oracle_state: oracle_pda,
+    oracle_program: sol_usd_oracle::ID,
+    mint: mint.pubkey(),
+    user_ata,
+    token_program: token::ID,
+    associated_token_program: associated_token::ID,
+    rent: Rent::id(),
+    system_program: system_program::ID,
+    token_metadata_program: system_program::ID, // Placeholder account for missing meta program
+    metadata: system_program::ID, // Placeholder account for missing meta account
   };
 
-  let tx = Transaction::new_signed_with_payer(
-    &[set_fee_usd_ix],
-    Some(&payer.pubkey()),
-    &[&payer],
-    svm.latest_blockhash(),
-  );
-
-  svm
-    .send_transaction(tx)
-    .map_err(|e| anyhow::anyhow!("{:#?}", e))?;
-
-  let account = svm.get_account(&mint_config_pda).unwrap();
-  let minter_config = MinterConfig::try_deserialize(&mut &account.data[..])?;
-
-  // Assert mint_fee_usd updated in mint config
-  assert_eq!(minter_config.mint_fee_usd, new_fee_usd);
-
-  // Assert rest of the min config fields stay intact
-  assert_eq!(minter_config.treasury, treasury.pubkey());
-  assert_eq!(minter_config.admin, payer.pubkey());
-  assert_eq!(minter_config.oracle_program, sol_usd_oracle::ID);
-  assert_eq!(minter_config.oracle_state, oracle_pda);
-  assert_eq!(minter_config.bump, mint_config_bump);
-
-  // 5. Mint config set new treasury
-  let new_treasury = Keypair::new();
-  let set_treasury_ix = Instruction {
+  let mint_token_ix = Instruction {
     program_id: minter_program_id,
-    accounts: token_minter::accounts::SetTreasury {
-      admin: payer.pubkey(),
-      config: mint_config_pda,
-    }
-    .to_account_metas(None),
-    data: token_minter::instruction::SetTreasury {
-      new_treasury: new_treasury.pubkey(),
+    accounts: token_minter::accounts::MintToken { ..mint_token_acc }
+      .to_account_metas(None),
+    data: token_minter::instruction::MintToken {
+      decimals: PRICE_DECIMALS,
+      initial_supply: 0,
+      name: "".into(),
+      symbol: "".into(),
+      uri: "".into(),
     }
     .data(),
   };
 
   let tx = Transaction::new_signed_with_payer(
-    &[set_treasury_ix],
+    &[mint_token_ix],
     Some(&payer.pubkey()),
-    &[&payer],
+    &[&payer, &mint],
     svm.latest_blockhash(),
   );
 
-  svm
-    .send_transaction(tx)
-    .map_err(|e| anyhow::anyhow!("{:#?}", e))?;
+  let res = svm.send_transaction(tx);
+  assert!(res.is_err());
 
-  let account = svm.get_account(&mint_config_pda).unwrap();
-  let minter_config = MinterConfig::try_deserialize(&mut &account.data[..])?;
+  // 5. Rejects mint when decimals exceed allowed range
+  let mint_token_ix = Instruction {
+    program_id: minter_program_id,
+    accounts: token_minter::accounts::MintToken { ..mint_token_acc }
+      .to_account_metas(None),
+    data: token_minter::instruction::MintToken {
+      decimals: 10,
+      initial_supply: 0,
+      name: "".into(),
+      symbol: "".into(),
+      uri: "".into(),
+    }
+    .data(),
+  };
 
-  // Assert new_treasury updated in mint config
-  assert_eq!(minter_config.treasury, new_treasury.pubkey());
+  let tx = Transaction::new_signed_with_payer(
+    &[mint_token_ix],
+    Some(&payer.pubkey()),
+    &[&payer, &mint],
+    svm.latest_blockhash(),
+  );
 
-  // Assert rest of the min config fields stay intact
-  assert_eq!(minter_config.mint_fee_usd, new_fee_usd);
-  assert_eq!(minter_config.admin, payer.pubkey());
-  assert_eq!(minter_config.oracle_program, sol_usd_oracle::ID);
-  assert_eq!(minter_config.oracle_state, oracle_pda);
-  assert_eq!(minter_config.bump, mint_config_bump);
+  let res = svm.send_transaction(tx);
+  assert!(res.is_err());
 
   Ok(())
 }

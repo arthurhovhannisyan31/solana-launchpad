@@ -3,10 +3,10 @@ use anchor_client::{
   solana_sdk::commitment_config::CommitmentConfig,
   solana_sdk::signature::Signer, Client, Cluster,
 };
-use programs_tests::{sync_airdrop, sync_confirm_transaction};
 use sol_usd_oracle::constants::{MAX_STALENESS_SLOTS, PRICE_DECIMALS};
 use sol_usd_oracle::{accounts, instruction, state::OracleState};
 use solana_keypair::Keypair;
+use tests::{sync_airdrop, sync_confirm_transaction};
 
 fn main() -> anyhow::Result<()> {
   let program_id = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3";

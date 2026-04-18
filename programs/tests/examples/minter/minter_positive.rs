@@ -8,10 +8,10 @@ use anchor_client::{
 use anchor_spl::token::spl_token::state::AccountState;
 use anchor_spl::token::{Mint, TokenAccount};
 use anchor_spl::{associated_token, token};
-use programs_tests::{sync_airdrop, sync_confirm_transaction};
 use sol_usd_oracle::constants::PRICE_DECIMALS;
 use sol_usd_oracle::{self, state::OracleState};
 use solana_keypair::Keypair;
+use tests::{sync_airdrop, sync_confirm_transaction};
 use token_minter::state::MinterConfig;
 use token_minter::utils::{calc_amount_raw, compute_fee_lamports};
 

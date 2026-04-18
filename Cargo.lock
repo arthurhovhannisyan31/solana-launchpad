@@ -3035,22 +3035,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "programs-tests"
-version = "0.1.0"
-dependencies = [
- "anchor-client",
- "anchor-lang",
- "anchor-spl",
- "anyhow",
- "litesvm",
- "sol-usd-oracle",
- "solana-keypair",
- "solana-pubkey",
- "solana-sdk",
- "token-minter",
-]
-
-[[package]]
 name = "qstring"
 version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6971,6 +6955,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "06794f8f6c5c898b3275aebefa6b8a1cb24cd2c6c79397ab15774837a0bc5755"
 dependencies = [
  "winapi-util",
+]
+
+[[package]]
+name = "tests"
+version = "0.1.0"
+dependencies = [
+ "anchor-client",
+ "anchor-lang",
+ "anchor-spl",
+ "anyhow",
+ "litesvm",
+ "sol-usd-oracle",
+ "solana-keypair",
+ "solana-pubkey",
+ "solana-sdk",
+ "token-minter",
 ]
 
 [[package]]

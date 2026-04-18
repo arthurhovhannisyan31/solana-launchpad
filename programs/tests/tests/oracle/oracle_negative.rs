@@ -19,8 +19,10 @@ fn test_oracle_negative() -> anyhow::Result<()> {
   let mut svm = LiteSVM::new();
   let program_id =
     "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3".parse::<Pubkey>()?;
-  svm
-    .add_program_from_file(program_id, "../target/deploy/sol_usd_oracle.so")?;
+  svm.add_program_from_file(
+    program_id,
+    "../../target/deploy/sol_usd_oracle.so",
+  )?;
 
   let payer = Keypair::new();
   let fake_payer = Keypair::new();

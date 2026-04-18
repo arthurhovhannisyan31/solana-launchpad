@@ -4,9 +4,9 @@ use anchor_client::{
   solana_sdk::commitment_config::CommitmentConfig,
   solana_sdk::signature::Signer, Client, Cluster,
 };
-use programs_tests::{sync_airdrop, sync_confirm_transaction};
 use sol_usd_oracle::{self, state::OracleState};
 use solana_keypair::Keypair;
+use tests::{sync_airdrop, sync_confirm_transaction};
 use token_minter::state::MinterConfig;
 
 fn main() -> anyhow::Result<()> {
