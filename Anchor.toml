@@ -2,23 +2,23 @@
 anchor_version = "0.32.1"
 package_manager = "yarn"
 
-[workspace]
-exclude = ["programs/tests"]
-
 [features]
 resolution = true
 skip-lint = false
 
 [programs.localnet]
-sol_usd_oracle = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3"
-token_minter = "DXm5uV6Zh3HZshCSUtfoodGDuyDrKnzmP3Nq29PTmYrU"
+sol_usd_oracle = "E5HbJS2cXteHwBUdRDWmUkp5Q3oaf3TBZz1rK4jnCzxx"
+token_minter = "CfAKuB2StvSWcmirGmQ5RFqib1rcgRTziSXuKQR3ptgE"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
 cluster = "localnet"
-wallet = "/home/q/.config/solana/id.json"
+wallet = "~/.config/solana/id.json"
+
+[workspace]
+exclude = ["programs/tests"]
 
 [scripts]
 test = "cargo test"

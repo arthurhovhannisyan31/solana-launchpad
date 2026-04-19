@@ -14,13 +14,11 @@ use solana_sdk::{
 #[test]
 fn test_oracle_positive() -> anyhow::Result<()> {
   let mut svm = LiteSVM::new();
-  let program_id =
-    "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3".parse::<Pubkey>()?;
+  let program_id = sol_usd_oracle::ID;
   svm.add_program_from_file(
     program_id,
     "../../target/deploy/sol_usd_oracle.so",
   )?;
-
   let payer = Keypair::new();
   svm
     .airdrop(&payer.pubkey(), 1_000_000_000)

@@ -20,8 +20,8 @@ const MINT_FEE_USD: u64 = 1000;
 const MINT_INITIAL_SUPPLY: u64 = 1_000_000;
 
 fn main() -> anyhow::Result<()> {
-  let oracle_program_id = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3";
-  let minter_program_id = "DXm5uV6Zh3HZshCSUtfoodGDuyDrKnzmP3Nq29PTmYrU";
+  let oracle_program_id = sol_usd_oracle::ID;
+  let minter_program_id = token_minter::ID;
   // Use random keypair to avoid key conflicts
   let payer = Keypair::new();
   let treasury = Keypair::new();

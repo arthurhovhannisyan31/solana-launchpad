@@ -10,7 +10,7 @@ use solana_keypair::Keypair;
 use tests::{sync_airdrop, sync_confirm_transaction};
 
 fn main() -> anyhow::Result<()> {
-  let program_id = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3";
+  let oracle_program_id = sol_usd_oracle::ID;
   // Use random keypair to avoid key conflicts
   let payer = Keypair::new();
 
@@ -19,7 +19,7 @@ fn main() -> anyhow::Result<()> {
     &payer,
     CommitmentConfig::confirmed(),
   );
-  let program_id = Pubkey::try_from(program_id)?;
+  let program_id = Pubkey::try_from(oracle_program_id)?;
   let program = client.program(program_id)?;
 
   let (oracle_pda, bump) =

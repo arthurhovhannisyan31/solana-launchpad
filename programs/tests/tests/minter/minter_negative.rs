@@ -19,21 +19,16 @@ const MINT_INITIAL_SUPPLY: u64 = 1_000_000;
 #[test]
 fn test_minter_positive() -> anyhow::Result<()> {
   let mut svm = LiteSVM::new();
-
-  let oracle_program_id =
-    "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3".parse::<Pubkey>()?;
+  let oracle_program_id = sol_usd_oracle::ID;
   svm.add_program_from_file(
     oracle_program_id,
     "../../target/deploy/sol_usd_oracle.so",
   )?;
-
-  let minter_program_id =
-    "DXm5uV6Zh3HZshCSUtfoodGDuyDrKnzmP3Nq29PTmYrU".parse::<Pubkey>()?;
+  let minter_program_id = token_minter::ID;
   svm.add_program_from_file(
     minter_program_id,
     "../../target/deploy/token_minter.so",
   )?;
-
   let payer = Keypair::new();
   let treasury = Keypair::new();
   let mint = Keypair::new();

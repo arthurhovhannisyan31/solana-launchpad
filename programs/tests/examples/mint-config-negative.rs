@@ -1,28 +1,20 @@
-use anchor_client::anchor_lang::prelude::sysvar::SysvarId;
-use anchor_client::anchor_lang::prelude::{system_program, Rent};
+use anchor_client::anchor_lang::prelude::system_program;
 use anchor_client::{
   anchor_lang::prelude::Pubkey,
   solana_sdk::commitment_config::CommitmentConfig,
   solana_sdk::signature::Signer, Client, Cluster,
 };
-use anchor_spl::{associated_token, token};
-use sol_usd_oracle::constants::PRICE_DECIMALS;
 use sol_usd_oracle::{self, state::OracleState};
 use solana_keypair::Keypair;
 use tests::{sync_airdrop, sync_confirm_transaction};
 use token_minter::state::MinterConfig;
 
 fn main() -> anyhow::Result<()> {
-  let oracle_program_id = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3";
-  let minter_program_id = "DXm5uV6Zh3HZshCSUtfoodGDuyDrKnzmP3Nq29PTmYrU";
+  let oracle_program_id = sol_usd_oracle::ID;
+  let minter_program_id = token_minter::ID;
   // Use random keypair to avoid key conflicts
   let payer = Keypair::new();
   let treasury = Keypair::new();
-  let mint = Keypair::new();
-  let user_ata = associated_token::get_associated_token_address(
-    &payer.pubkey(),
-    &mint.pubkey(),
-  );
 
   let client = Client::new_with_options(
     Cluster::Localnet,
@@ -71,6 +63,23 @@ fn main() -> anyhow::Result<()> {
     })
     .send()?;
 
+  // Rejects mint config initialize when mint fee is zero
+  let res = minter_program
+    .request()
+    .accounts(token_minter::accounts::InitializeMinter {
+      admin: payer.pubkey(),
+      config: mint_config_pda,
+      system_program: system_program::ID,
+    })
+    .args(token_minter::instruction::InitializeMinter {
+      treasury: treasury.pubkey(),
+      mint_fee_usd: 0,
+      oracle_state: oracle_pda,
+      oracle_program: sol_usd_oracle::ID,
+    })
+    .send();
+  assert!(res.is_err());
+
   // Initialize mint config account
   let signature = minter_program
     .request()
@@ -88,49 +97,14 @@ fn main() -> anyhow::Result<()> {
     .send()?;
   sync_confirm_transaction(&minter_program, &signature)?;
 
-  let mint_token_acc = token_minter::accounts::MintToken {
-    config: mint_config_pda,
-    user: payer.pubkey(),
-    treasury: treasury.pubkey(),
-    oracle_state: oracle_pda,
-    oracle_program: sol_usd_oracle::ID,
-    mint: mint.pubkey(),
-    user_ata,
-    token_program: token::ID,
-    associated_token_program: associated_token::ID,
-    rent: Rent::id(),
-    system_program: system_program::ID,
-    token_metadata_program: system_program::ID, // Placeholder account for missing meta program
-    metadata: system_program::ID, // Placeholder account for missing meta account
-  };
-
-  // Rejects mint creation if supply is zero
+  // Rejects set new fee equals zero
   let res = minter_program
     .request()
-    .accounts(token_minter::accounts::MintToken { ..mint_token_acc })
-    .args(token_minter::instruction::MintToken {
-      decimals: PRICE_DECIMALS,
-      initial_supply: 0,
-      name: "".into(),
-      symbol: "".into(),
-      uri: "".into(),
+    .accounts(token_minter::accounts::SetFeeUsd {
+      admin: payer.pubkey(),
+      config: mint_config_pda,
     })
-    .signer(&mint)
-    .send();
-  assert!(res.is_err());
-
-  // Rejects mint when decimals exceed allowed range
-  let res = minter_program
-    .request()
-    .accounts(token_minter::accounts::MintToken { ..mint_token_acc })
-    .args(token_minter::instruction::MintToken {
-      decimals: 10,
-      initial_supply: 0,
-      name: "".into(),
-      symbol: "".into(),
-      uri: "".into(),
-    })
-    .signer(&mint)
+    .args(token_minter::instruction::SetFeeUsd { new_fee_usd: 0 })
     .send();
   assert!(res.is_err());
 

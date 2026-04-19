@@ -6,10 +6,11 @@ use anchor_client::{
 use sol_usd_oracle::constants::{MAX_STALENESS_SLOTS, PRICE_DECIMALS};
 use sol_usd_oracle::{accounts, instruction, state::OracleState};
 use solana_keypair::Keypair;
+use std::time::Duration;
 use tests::{sync_airdrop, sync_confirm_transaction};
 
 fn main() -> anyhow::Result<()> {
-  let program_id = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3";
+  let oracle_program_id = sol_usd_oracle::ID;
   // Use random keypair to avoid key conflicts
   let payer = Keypair::new();
   let fake_payer = Keypair::new();
@@ -19,7 +20,7 @@ fn main() -> anyhow::Result<()> {
     &payer,
     CommitmentConfig::confirmed(),
   );
-  let program_id = Pubkey::try_from(program_id)?;
+  let program_id = Pubkey::try_from(oracle_program_id)?;
   let program = client.program(program_id)?;
 
   let (oracle_pda, _bump) =
@@ -101,13 +102,19 @@ fn main() -> anyhow::Result<()> {
   assert_eq!(oracle_state.decimals, PRICE_DECIMALS);
 
   // Reset oracle last updated value
-  let cur_slot = program.rpc().get_slot()?;
+  let mut cur_slot = program.rpc().get_slot()?;
+
+  // Wait until stop number becomes greater than threshold
+  while cur_slot < 100 {
+    std::thread::sleep(Duration::from_millis(250));
+    cur_slot = program.rpc().get_slot()?;
+  }
 
   program
     .request()
     .accounts(accounts::ResetOracle { oracle: oracle_pda })
     .args(instruction::ResetOracle {
-      new_slot: cur_slot.saturating_sub(MAX_STALENESS_SLOTS + 1),
+      new_slot: cur_slot.saturating_sub(MAX_STALENESS_SLOTS),
     })
     .send()?;
 

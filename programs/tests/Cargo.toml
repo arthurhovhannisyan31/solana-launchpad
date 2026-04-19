@@ -9,11 +9,11 @@ anchor-spl = { version = "0.32.1", features = ["token", "associated_token"] }
 solana-keypair = "2.2.3"
 solana-pubkey = "2.3.0"
 anyhow = "1"
-sol-usd-oracle = { path = "../sol_usd_oracle", version = "0.1.0", features = ["default"] }
-token-minter = { path = "../token_minter", version = "0.1.0" }
 anchor-lang = "0.32.1"
 solana-sdk = "2.3.1"
 litesvm = "0.7.1"
+sol-usd-oracle = { path = "../sol_usd_oracle", version = "0.1.0", features = ["default"] }
+token-minter = { path = "../token_minter", version = "0.1.0" }
 
 [[example]]
 name = "init-accounts"
@@ -22,3 +22,27 @@ path = "examples/init-accounts.rs"
 [[example]]
 name = "get-oracle-pda"
 path = "examples/get-oracle-pda.rs"
+
+[[exampe]]
+name = "oracle-positive"
+path = "examples/oracle-positive.rs"
+
+[[exampe]]
+name = "oracle-negative"
+path = "examples/oracle-negative.rs"
+
+[[exampe]]
+name = "mint-config-negative"
+path = "examples/mint-config-negative.rs"
+
+[[exampe]]
+name = "mint-config-positive"
+path = "examples/mint-config-positive.rs"
+
+[[exampe]]
+name = "minter-negative"
+path = "examples/minter-negative.rs"
+
+[[exampe]]
+name = "minter-positive"
+path = "examples/minter-positive.rs"

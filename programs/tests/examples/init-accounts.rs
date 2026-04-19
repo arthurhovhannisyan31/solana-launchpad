@@ -14,8 +14,8 @@ const INITIAL_PRICE: u64 = 120_000_000;
 const MINT_FEE_USD: u64 = 5_000_000;
 
 fn main() -> anyhow::Result<()> {
-  let oracle_program_id = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3";
-  let minter_program_id = "DXm5uV6Zh3HZshCSUtfoodGDuyDrKnzmP3Nq29PTmYrU";
+  let oracle_program_id = sol_usd_oracle::ID;
+  let minter_program_id = token_minter::ID;
   let payer = read_keypair_file("/home/q/.config/solana/id.json").unwrap();
 
   let cluster_type = std::env::var("CLUSTER").unwrap_or("localnet".into());
