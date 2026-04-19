@@ -9,7 +9,7 @@ pub struct InitializeOracle<'info> {
     payer = admin,
     seeds = [OracleState::SEED],
     bump,
-    space = DISCRIMINANT + OracleState::SIZE
+    space = DISCRIMINANT + OracleState::INIT_SPACE
   )]
   pub oracle: Account<'info, OracleState>,
   #[account(mut)]

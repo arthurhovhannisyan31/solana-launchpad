@@ -9,7 +9,7 @@ pub struct InitializeMinter<'info> {
     payer = admin,
     seeds = [MinterConfig::SEED],
     bump,
-    space = DISCRIMINANT + MinterConfig::SIZE
+    space = DISCRIMINANT + MinterConfig::INIT_SPACE,
   )]
   pub config: Account<'info, MinterConfig>,
   #[account(mut)]

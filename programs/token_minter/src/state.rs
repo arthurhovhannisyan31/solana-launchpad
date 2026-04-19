@@ -2,7 +2,7 @@ use crate::constants::ADDRESS_SIZE;
 use anchor_lang::prelude::*;
 
 #[account]
-#[derive(Debug)]
+#[derive(Debug, InitSpace)]
 pub struct MinterConfig {
   pub admin: Pubkey,
   pub treasury: Pubkey,
@@ -15,7 +15,7 @@ pub struct MinterConfig {
 impl MinterConfig {
   pub const SEED: &'static [u8] = b"minter_config";
   pub const SIZE: usize =
-    ADDRESS_SIZE + ADDRESS_SIZE + 8 + ADDRESS_SIZE + ADDRESS_SIZE + 1 + 7; // +7 padding for alignment
+    ADDRESS_SIZE + ADDRESS_SIZE + 8 + ADDRESS_SIZE + ADDRESS_SIZE + 1;
 }
 
 #[event]
