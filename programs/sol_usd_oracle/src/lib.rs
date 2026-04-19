@@ -9,7 +9,7 @@ use constants::*;
 use instructions::*;
 use state::*;
 
-declare_id!("24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3");
+declare_id!("E5HbJS2cXteHwBUdRDWmUkp5Q3oaf3TBZz1rK4jnCzxx");
 
 #[program]
 pub mod sol_usd_oracle {

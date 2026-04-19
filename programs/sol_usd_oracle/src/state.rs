@@ -2,7 +2,7 @@ use crate::constants::ADDRESS_SIZE;
 use anchor_lang::prelude::*;
 
 #[account]
-#[derive(Debug)]
+#[derive(Debug, InitSpace)]
 pub struct OracleState {
   pub admin: Pubkey,
   pub price: u64,

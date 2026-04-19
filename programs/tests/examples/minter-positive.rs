@@ -8,10 +8,10 @@ use anchor_client::{
 use anchor_spl::token::spl_token::state::AccountState;
 use anchor_spl::token::{Mint, TokenAccount};
 use anchor_spl::{associated_token, token};
-use programs_tests::{sync_airdrop, sync_confirm_transaction};
 use sol_usd_oracle::constants::PRICE_DECIMALS;
 use sol_usd_oracle::{self, state::OracleState};
 use solana_keypair::Keypair;
+use tests::{sync_airdrop, sync_confirm_transaction};
 use token_minter::state::MinterConfig;
 use token_minter::utils::{calc_amount_raw, compute_fee_lamports};
 
@@ -20,8 +20,8 @@ const MINT_FEE_USD: u64 = 1000;
 const MINT_INITIAL_SUPPLY: u64 = 1_000_000;
 
 fn main() -> anyhow::Result<()> {
-  let oracle_program_id = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3";
-  let minter_program_id = "DXm5uV6Zh3HZshCSUtfoodGDuyDrKnzmP3Nq29PTmYrU";
+  let oracle_program_id = sol_usd_oracle::ID;
+  let minter_program_id = token_minter::ID;
   // Use random keypair to avoid key conflicts
   let payer = Keypair::new();
   let treasury = Keypair::new();

@@ -3,7 +3,7 @@ use sol_usd_oracle::{self, state::OracleState};
 use token_minter::state::MinterConfig;
 
 fn main() -> anyhow::Result<()> {
-  let oracle_program_id = "24UJLhNSDEwFrziTkshg6Rt18K7H3RczKXR8fNpQ8xa3";
+  let oracle_program_id = sol_usd_oracle::ID;
 
   let oracle_program_id = Pubkey::try_from(oracle_program_id)?;
   let minter_program_id = Pubkey::try_from(oracle_program_id)?;
